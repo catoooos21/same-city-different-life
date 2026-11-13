@@ -11,10 +11,20 @@ const gistempTrend = annualTrend(gistemp.years, gistemp.values)
 export function GlobalContext({ a, cityName }: { a: CityAnalysis; cityName: string }) {
   const city = a.results.mean_temp
   if (!city?.trend || !gistempTrend) return null
+  const c = city.slopePerDecade!
+  const g = gistempTrend.slope * 10
+  const ratio = g > 0 ? c / g : null
+  let words: string
+  if (!city.trend.significant) words = `${cityName} has not warmed in a way we can be sure of since ${YEARS.first}.`
+  else if (ratio !== null && ratio >= 1.5) words = `${cityName} is warming about ${ratio.toFixed(1).replace(/\.0$/, '')} times faster than the world as a whole.`
+  else if (ratio !== null && ratio >= 0.75) words = `${cityName} is warming at about the same pace as the world as a whole.`
+  else words = `${cityName} is warming more slowly than the world as a whole.`
   return (
     <p className="globalline">
-      <strong>{cityName}</strong> warmed {fmtSigned(city.slopePerDecade, 2)} °C per decade since {YEARS.first} (95% CI {fmtSigned(city.ciPerDecade![0], 2)} to{' '}
-      {fmtSigned(city.ciPerDecade![1], 2)}). The world as a whole: {fmtSigned(gistempTrend.slope * 10, 2)} °C per decade (NASA GISTEMP v4).
+      <strong>{words}</strong>{' '}
+      <span className="muted small">
+        Here: {fmtSigned(c, 2)} °C per decade since {YEARS.first}. World: {fmtSigned(g, 2)} °C per decade (NASA GISTEMP).
+      </span>
     </p>
   )
 }
@@ -30,44 +40,63 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
       <div className="methods-body">
         <h4>Where the numbers come from</h4>
         <p>
-          Daily weather for the point {d.lat.toFixed(3)}, {d.lon.toFixed(3)} from the <a href="https://power.larc.nasa.gov/">NASA POWER</a> daily API. POWER serves NASA’s{' '}
-          <a href="https://gmao.gsfc.nasa.gov/reanalysis/MERRA-2/">MERRA-2</a> reanalysis, a global model run by the Global Modeling and Assimilation Office that assimilates satellite and ground
-          observations. Values are for the MERRA-2 grid cell (about 0.5° × 0.625°, roughly 50 km) containing the point, in local solar time. Sources reported by POWER for this request:{' '}
-          {d.header.sources?.join(', ') ?? 'MERRA2, POWER'}. {d.header.api ? `API ${d.header.api}. ` : ''}The app asks POWER directly from your browser; nothing is pre-computed except the
-          four demo cities.
+          NASA keeps a record of the weather for every day since {YEARS.first}, for every place on Earth. It comes from MERRA-2, NASA’s global weather model, which blends satellite and
+          ground measurements. We ask NASA’s <a href="https://power.larc.nasa.gov/">POWER</a> service for this spot and get {YEARS.last - YEARS.first + 1} years of daily
+          temperatures, humidity and rain. One square about 50 km wide stands for the whole city.
         </p>
-        <ul className="params">
-          {PARAMS.map((p) => (
-            <li key={p}>
-              <code>{p}</code> {PARAM_INFO[p].name} ({PARAM_INFO[p].unit})
+
+        <h4>What counts as “hot” here</h4>
+        <p>
+          We let {cityName} set its own bar, using its weather from {BASELINE.first} to {BASELINE.last}. A hot day here is hotter than <strong>{fmtNum(a.ctx.p90max, 1)} °C</strong>, a hot
+          night stays above <strong>{fmtNum(a.ctx.p90min, 1)} °C</strong>. That is why “hot” means hot for this city, not hot for London.
+        </p>
+
+        <h4>What each card counts</h4>
+        <ul className="plaindefs">
+          {used.map((m) => (
+            <li key={m.id}>
+              <strong>{m.name}:</strong> {m.definition.split(/(?<=\.)\s/)[0]}
             </li>
           ))}
         </ul>
+
+        <h4>Real change, or can’t tell?</h4>
         <p>
-          Only full calendar years {YEARS.first}–{YEARS.last} are used; {YEARS.last + 1} never enters a statistic. A year is dropped for a metric when more than {MAX_MISSING_FRACTION * 100}% of its
-          days are missing. {maxMissing === 0 ? 'No days are missing for this city.' : `Worst year here: ${(maxMissing * 100).toFixed(1)}% of days missing.`} Leap days are counted like any other day.
+          For each card we line up one number per year, {YEARS.last - YEARS.first + 1} years in a row, and run a standard trend test used by climate scientists. If a trend that strong would
+          show up by pure luck less than 5 times in 100, we stamp it <strong>Real change</strong>. If not, we say <strong>Can’t tell</strong>: there may still be a trend, but the years
+          bounce around too much to be sure. “Then” and “Now” are simple averages of the years in each period.
         </p>
 
-        <h4>What each number means here</h4>
-        <p>
-          Local thresholds use this city’s own {BASELINE.first}–{BASELINE.last} baseline: the {THRESHOLDS.hotPercentile}th percentile of daily maxima is <strong>{fmtNum(a.ctx.p90max, 1)} °C</strong>{' '}
-          and of daily minima <strong>{fmtNum(a.ctx.p90min, 1)} °C</strong>, so “hot” means hot for {cityName}.
-        </p>
-        <dl className="defs">
-          {used.map((m) => (
-            <div key={m.id}>
-              <dt>
-                {m.name}
-                {m.etccdi && <span className="etccdi">ETCCDI {m.etccdi}</span>}
-              </dt>
-              <dd>{m.definition}</dd>
-            </div>
-          ))}
-        </dl>
-        <details>
-          <summary>Other metrics used by other lenses</summary>
+        <h4>Keep in mind</h4>
+        <ul>
+          <li>This is a model’s view of the weather, not a thermometer in your street. Temperature and humidity trends are very reliable; rain at one spot is less certain.</li>
+          <li>Two people born close together share years, so their difference looks smaller than the long-term trend.</li>
+          <li>The outdoor-worker cards are a weather proxy, not a safety standard.</li>
+        </ul>
+
+        <details className="details-more">
+          <summary>Details for the curious</summary>
+          <h5>Data</h5>
+          <p>
+            NASA POWER daily point API, point {d.lat.toFixed(3)}, {d.lon.toFixed(3)}; MERRA-2 grid cell 0.5° × 0.625°, local solar time. Sources reported by POWER:{' '}
+            {d.header.sources?.join(', ') ?? 'MERRA2, POWER'}. {d.header.api ? `API ${d.header.api}. ` : ''}Only full calendar years {YEARS.first}–{YEARS.last}; {YEARS.last + 1} never enters a
+            statistic. A year is dropped for a metric when more than {MAX_MISSING_FRACTION * 100}% of its days are missing.{' '}
+            {maxMissing === 0 ? 'No days are missing for this city.' : `Worst year here: ${(maxMissing * 100).toFixed(1)}% of days missing.`} Leap days count like any other day.
+          </p>
+          <ul className="params">
+            {PARAMS.map((p) => (
+              <li key={p}>
+                <code>{p}</code> {PARAM_INFO[p].name} ({PARAM_INFO[p].unit})
+              </li>
+            ))}
+          </ul>
+          <h5>Full definitions</h5>
+          <p className="small">
+            Local thresholds are the {THRESHOLDS.hotPercentile}th percentile of the {BASELINE.first}–{BASELINE.last} daily values, all days of the year pooled. ETCCDI codes are the WMO
+            climate-extremes indices; “variant” means the same idea with a whole-year percentile.
+          </p>
           <dl className="defs">
-            {others.map((m) => (
+            {[...used, ...others].map((m) => (
               <div key={m.id}>
                 <dt>
                   {m.name}
@@ -77,47 +106,36 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
               </div>
             ))}
           </dl>
+          <h5>Statistics</h5>
+          <p>
+            Annual series {YEARS.first}–{YEARS.last}. Trend test: Mann-Kendall with the Hamed and Rao (1998) variance correction for autocorrelation, two-sided, α = 0.05. Trend size: Sen’s slope
+            (median of pairwise slopes) with a 95% confidence interval after Sen (1968). The browser implementation is tested against the Python packages <code>pymannkendall</code> and{' '}
+            <code>scipy</code> on the same series. Tap any card to see the slope per decade, its confidence interval and the p-value.
+          </p>
+          <h5>Limits</h5>
+          <ul>
+            <li>Reanalyses can show small artificial jumps when the satellites they assimilate change.</li>
+            <li>Coastal cities may sit in a grid cell that is partly sea, which cools the absolute numbers.</li>
+            <li>Forty-five years is long for temperature counts, short for rare events such as the biggest downpour.</li>
+          </ul>
+          <h5>Credits</h5>
+          <ul>
+            <li>
+              NASA POWER Project, daily point API, MERRA-2 meteorology. <a href="https://power.larc.nasa.gov/docs/">Documentation</a>.
+            </li>
+            <li>
+              NASA GISS Surface Temperature Analysis (GISTEMP v4), global annual means. <a href="https://data.giss.nasa.gov/gistemp/">data.giss.nasa.gov/gistemp</a>.
+            </li>
+            <li>
+              City list: <a href="https://www.geonames.org/">GeoNames</a>, cities over 100,000 people, <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
+            </li>
+            <li>
+              “Perfect outdoor days” follows the outdoor-days idea of Choi, Khalifa and Eltahir (2024), Journal of Climate,{' '}
+              <a href="https://doi.org/10.1175/JCLI-D-23-0346.1">doi:10.1175/JCLI-D-23-0346.1</a>. Our thresholds are our own.
+            </li>
+            <li>Hamed and Rao (1998), Journal of Hydrology 204. Sen (1968), JASA 63.</li>
+          </ul>
         </details>
-        <p>
-          ETCCDI are the standard climate-extremes indices of the WMO Expert Team on Climate Change Detection and Indices. Where a metric matches one, the code is shown; “variant” means the
-          same idea with a simpler, whole-year percentile.
-        </p>
-
-        <h4>The statistics</h4>
-        <p>
-          For every metric we build one value per year, {YEARS.first}–{YEARS.last} ({YEARS.last - YEARS.first + 1} years). <strong>“Real change”</strong> means the Mann-Kendall trend test, with
-          the Hamed and Rao (1998) correction for autocorrelation, gives p &lt; 0.05. <strong>“Can’t tell”</strong> means it does not: there may still be a trend, but the year-to-year variation
-          is too large to be sure from this record. The size of the trend is Sen’s slope (the median of all pairwise slopes), shown per decade with a 95% confidence interval. “Then” and “Now”
-          are plain averages of the yearly values in each period, and the difference is simply Now minus Then. The JavaScript implementation is tested against the Python packages{' '}
-          <code>pymannkendall</code> and <code>scipy</code> on the same series.
-        </p>
-
-        <h4>Limits</h4>
-        <ul>
-          <li>MERRA-2 is a model, not a thermometer. It is excellent for trends in temperature and humidity; precipitation at a single point is less certain, even in the bias-corrected product we use.</li>
-          <li>One grid cell of about 50 km represents the whole city. Coastal cities may sit in a cell that is partly sea, which cools the numbers; the trend is still the trend of that place.</li>
-          <li>Reanalyses can show small artificial jumps when the satellites they assimilate change. Forty-five years is long enough for robust trends in temperature counts, shorter for rare events.</li>
-          <li>A childhood is ten calendar years from the birth year. Two kids ten years apart can share years, which makes their difference smaller, not larger.</li>
-          <li>The outdoor-worker lens is a weather proxy, not an occupational safety standard.</li>
-        </ul>
-
-        <h4>Credits</h4>
-        <ul>
-          <li>
-            NASA POWER Project, daily point API, MERRA-2 meteorology. <a href="https://power.larc.nasa.gov/docs/">Documentation</a>.
-          </li>
-          <li>
-            NASA GISS Surface Temperature Analysis (GISTEMP v4), global land-ocean annual means, for the “vs the world” line. <a href="https://data.giss.nasa.gov/gistemp/">data.giss.nasa.gov/gistemp</a>.
-          </li>
-          <li>
-            City list: <a href="https://www.geonames.org/">GeoNames</a> cities with population over 100,000, licensed <a href="https://creativecommons.org/licenses/by/4.0/">CC BY 4.0</a>.
-          </li>
-          <li>
-            “Perfect outdoor days” follows the idea of outdoor days in Choi, Y.-W., Khalifa, M. and Eltahir, E. A. B. (2024), “North–South disparity in impact of climate change on ‘outdoor
-            days’”, Journal of Climate, <a href="https://doi.org/10.1175/JCLI-D-23-0346.1">doi:10.1175/JCLI-D-23-0346.1</a>. Our thresholds are our own.
-          </li>
-          <li>Hamed, K. H. and Rao, A. R. (1998), “A modified Mann-Kendall trend test for autocorrelated data”, Journal of Hydrology 204. Sen, P. K. (1968), JASA 63.</li>
-        </ul>
       </div>
     </details>
   )

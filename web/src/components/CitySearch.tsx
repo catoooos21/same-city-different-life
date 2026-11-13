@@ -15,6 +15,14 @@ function loadCities(): Promise<Row[]> {
   return loading
 }
 
+/**
+ * Display name: GeoNames "name" keeps transliteration marks such as "Ḩawallī"; use the ASCII
+ * name when the name has characters beyond Latin Extended-B, keep "São Paulo"-style names.
+ */
+function displayName(name: string, ascii: string): string {
+  return /[^\u0000-ɏ]/.test(name) ? ascii : name
+}
+
 function fold(s: string): string {
   return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase()
 }
@@ -44,6 +52,7 @@ export function CitySearch({ value, onChange, autoFocus }: { value: City | null;
   const [lat, setLat] = useState(value ? String(value.lat) : '')
   const [lon, setLon] = useState(value ? String(value.lon) : '')
   const box = useRef<HTMLDivElement>(null)
+  const typed = useRef(false)
 
   useEffect(() => {
     if (value) setText(value.country ? `${value.name}, ${value.country}` : value.name)
@@ -63,6 +72,7 @@ export function CitySearch({ value, onChange, autoFocus }: { value: City | null;
 
   function update(t: string) {
     setText(t)
+    typed.current = true
     ensure()
     const r = rows.length ? rows : cache ?? []
     const h = search(r, t)
@@ -71,8 +81,9 @@ export function CitySearch({ value, onChange, autoFocus }: { value: City | null;
     setOpen(h.length > 0)
   }
 
+  // The city list loads lazily; once it arrives, search whatever the user has typed so far.
   useEffect(() => {
-    if (rows.length && text && !value) {
+    if (rows.length && text && typed.current) {
       const h = search(rows, text)
       setHits(h)
       setOpen(h.length > 0)
@@ -81,8 +92,10 @@ export function CitySearch({ value, onChange, autoFocus }: { value: City | null;
   }, [rows])
 
   function pick(r: Row) {
-    onChange({ name: r[0], country: r[2], lat: r[3], lon: r[4] })
-    setText(`${r[0]}, ${r[2]}`)
+    const name = displayName(r[0], r[1])
+    typed.current = false
+    onChange({ name, country: r[2], lat: r[3], lon: r[4] })
+    setText(`${name}, ${r[2]}`)
     setOpen(false)
   }
 
@@ -123,7 +136,7 @@ export function CitySearch({ value, onChange, autoFocus }: { value: City | null;
             <ul className="city-list" role="listbox">
               {hits.map((r, i) => (
                 <li key={`${r[0]}-${r[3]}-${r[4]}`} role="option" aria-selected={i === active} className={i === active ? 'active' : ''} onMouseDown={() => pick(r)}>
-                  <span>{r[0]}</span>
+                  <span>{displayName(r[0], r[1])}</span>
                   <small>{r[2]}</small>
                 </li>
               ))}
