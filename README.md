@@ -17,10 +17,10 @@ nothing is hand-typed or simulated.
 
 | Case | Question | Verdict (filled by the pipeline) |
 |------|----------|----------------------------------|
-| Heat | Is Kuwait heating up, and faster than the world? | *pending step 2* |
-| Dust | Is Kuwait getting dustier? | *pending step 3* |
-| Sea | Is the water around Kuwait getting warmer and greener? | *pending step 4* |
-| Connected | Do hotter years bring more dust? | *pending step 7* |
+| Heat | Is Kuwait heating up, and faster than the world? | **Significant increase**: +0.53 °C per decade (95% CI +0.29 to +0.76), +1.27 °C over 2001-2025, p < 0.001, 25 years. About 2.1x the GISTEMP global rate (+0.25 °C/decade). *Currently from the NASA POWER fallback (MERRA-2 T2M served by POWER); MODIS LST pending Earthdata login.* |
+| Dust | Is Kuwait getting dustier? | **No significant trend**: +0.015 AOD per decade (95% CI -0.012 to +0.059), p = 0.25. *Currently total AOD from NASA POWER (CERES SYN1deg) as a labelled fallback; MERRA-2 dust-only and MODIS Deep Blue pending Earthdata login.* |
+| Sea | Is the water around Kuwait getting warmer and greener? | *pending Earthdata login (MODIS Aqua has no login-free fallback)* |
+| Connected | Do hotter years bring more dust? | **No significant correlation** between annual temperature and dust anomalies (Pearson r = +0.07, p = 0.74; detrended r = -0.09). Correlation is not causation. |
 
 Each verdict reports: what changed, where (map), how much (Sen's slope per decade, total change,
 % vs baseline) and whether it is significant (p-value, number of years).
@@ -29,13 +29,15 @@ Each verdict reports: what changed, where (map), how much (Sen's slope per decad
 
 - [x] **Step 1** Repo scaffold, dataset check against NASA CMR, stats module with unit tests.
       See [docs/datasets_cmr_check.md](docs/datasets_cmr_check.md) for the availability table.
-- [ ] Step 2 Heat case end-to-end + first deploy
-- [ ] Step 3 Dust case
-- [ ] Step 4 Sea case
-- [ ] Step 5 Per-pixel trend maps
-- [ ] Step 6 Heat strip + region picker
-- [ ] Step 7 Connected case
-- [ ] Step 8 Polish, About/Data page, final deploy
+- [x] **Step 2** Heat case end-to-end (pipeline -> JSON -> web page with verdict, charts, map). Running on the
+      labelled NASA POWER fallback until Earthdata Login is configured. Deploy: GitHub Pages workflow ready,
+      waiting for a remote.
+- [x] **Step 3** Dust case (fallback for now; MERRA-2 dust + MODIS cross-check wired, need login).
+- [ ] Step 4 Sea case (code written in `pipeline/cases/sea.py`; needs Earthdata login).
+- [x] **Step 5** Per-pixel trend maps with BH-FDR (`data/processed/maps/`).
+- [x] **Step 6** Month x year heat strip, per-month trends, region picker (All Kuwait, Kuwait City metro, Jahra, Ahmadi).
+- [x] **Step 7** Connected case (Pearson + Spearman + detrended correlation).
+- [ ] Step 8 Polish, team names, final deploy with Earthdata data.
 
 ## Study area and period
 
@@ -58,8 +60,10 @@ Each verdict reports: what changed, where (map), how much (Sen's slope per decad
 | M2C0NXASM (MERRA-2 constants) | 5.12.4 | FRLAND, FROCEAN | Land/ocean mask on the MERRA-2 grid | 10.5067/ME5QX6Q5IGGU |
 | GISTEMP v4 (NASA GISS) | - | GLB.Ts+dSST.csv | Global annual mean for the "vs the world" comparison | data.giss.nasa.gov/gistemp |
 
-Fallback (only if Earthdata access breaks, and labelled in the app): NASA POWER API monthly
-T2M / AOD_55, which are themselves derived from MERRA-2.
+Fallback (only while Earthdata access is unavailable, and labelled in the app and in `index.json`):
+NASA POWER regional monthly API. POWER's T2M / T2M_MAX are MERRA-2 values on the native MERRA-2
+grid; POWER's AOD_55 is *total* aerosol optical depth from CERES SYN1deg, not MERRA-2 dust, so the
+dust fallback is clearly marked as a stand-in.
 
 Notes from the CMR check: all collections exist and have every expected monthly granule for our
 years and area. MODISA_L3m_CHL returns duplicate metadata records for months from July 2021
@@ -127,7 +131,10 @@ Space Apps asks teams to disclose how AI tools were used. This project was built
 session between the team and Claude (Anthropic) in Claude Code:
 
 - Claude wrote the initial repo scaffold, the CMR dataset checker, the statistics module and its
-  unit tests, and drafts of this README, following a brief written by the team.
+  unit tests, the data pipeline (Earthdata access, NASA POWER fallback, region masks, case builders),
+  the React web app, and drafts of this README, following a brief written by the team.
+- The verdict sentences are templates filled with computed numbers; no AI model generates or
+  interprets results at run time.
 - Every dataset short name and version was verified programmatically against NASA CMR, not taken
   from the AI's memory. Where the AI's assumption was wrong (MOD08_M3 version string) the CMR result
   was used.
