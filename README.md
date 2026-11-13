@@ -17,7 +17,7 @@ For every number the app answers the four challenge questions:
 | **What** is changing | each lens is a list of plain-language metrics (hot days, nights too hot to sleep, rainy days, perfect outdoor days, …) |
 | **Where** | any city (GeoNames, population > 100,000) or any coordinates; the MERRA-2 grid cell for that point |
 | **How much** | Then vs Now averages, their difference, and Sen’s slope per decade with a 95 % confidence interval |
-| **Significant?** | Mann-Kendall test with the Hamed–Rao autocorrelation correction, shown as **Real change** (p < 0.05) or **Can’t tell** |
+| **Significant?** | Mann-Kendall test with the Hamed–Rao autocorrelation correction, shown as **Real change** (p < 0.05) or **No clear change** (no significant trend) |
 
 ## Try it
 
@@ -109,8 +109,8 @@ For each city and metric the app builds one value per year, 1981–2025, then:
   If the correction produces a non-finite variance the plain test is used and the panel says so.
 - **Slope**: Sen’s slope (median of pairwise slopes) with a 95 % confidence interval (Sen 1968, eq. 2.6).
 - **Report**: change per decade with CI, the average per year in each period, the difference between the
-  periods, the p-value, the number of complete years, and the label *Real change* (p < 0.05) or *Can’t tell*.
-  A “Can’t tell” still shows the slope: a trend can be interesting without reaching significance.
+  periods, the p-value, the number of complete years, and the label *Real change* (p < 0.05) or *No clear change*.
+  A “No clear change” still shows the slope: a trend can be interesting without reaching significance.
 
 The statistics run in the browser ([web/src/stats.ts](web/src/stats.ts)). They are a line-by-line port of
 `pymannkendall.hamed_rao_modification_test` and `scipy.stats.theilslopes`, and

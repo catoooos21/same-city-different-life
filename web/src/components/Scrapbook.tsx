@@ -15,7 +15,7 @@ function Verdict({ r }: { r: MetricResult }) {
   const t = r.trend
   if (!t) return <span className="stamp none">Too few years</span>
   if (t.significant) return <span className={`stamp real ${t.direction}`}>Real change</span>
-  return <span className="stamp cant">Can’t tell</span>
+  return <span className="stamp cant">No clear change</span>
 }
 
 function Tile({ r, stat, side, onClick, active }: { r: MetricResult; stat: { mean: number | null; validYears: number; totalYears: number }; side: 'then' | 'now'; onClick: () => void; active: boolean }) {
@@ -54,7 +54,7 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
   // One plain line about the long-term trend; the numbers live behind "tap any number".
   let trendWords = ''
   if (t) {
-    if (!t.significant) trendWords = 'Ups and downs since 1981, no clear trend.'
+    if (!t.significant) trendWords = 'Up some years, down others, since 1981.'
     else trendWords = t.direction === 'up' ? 'Going up steadily since 1981.' : 'Going down steadily since 1981.'
   }
   return (
@@ -164,7 +164,7 @@ export function TrendSentence({ r }: { r: MetricResult }) {
         </>
       ) : (
         <>
-          <strong>Can’t tell.</strong> The best guess is {fmtSigned(s, 1)} {unit} every ten years, but it could be anywhere between {fmtSigned(lo, 1)} and {fmtSigned(hi, 1)}, so no clear direction.
+          <strong>No clear change.</strong> The best guess is {fmtSigned(s, 1)} {unit} every ten years, but it could be anywhere between {fmtSigned(lo, 1)} and {fmtSigned(hi, 1)}, so no steady direction.
         </>
       )}{' '}
       <small className="muted">

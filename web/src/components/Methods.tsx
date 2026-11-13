@@ -50,7 +50,7 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
             <strong>Real change</strong> means {YEARS.last - YEARS.first + 1} years in a row point the same way, and a standard scientific test says it is very unlikely to be luck.
           </li>
           <li>
-            <strong>Can’t tell</strong> means the years jump around too much to be sure.
+            <strong>No clear change</strong> means some years go up, some go down, and 45 years show no steady direction.
           </li>
           <li>
             <strong>Keep in mind:</strong> this is NASA’s weather model, not a thermometer in your street. Heat is very reliable, rain less so.
