@@ -3,6 +3,7 @@ import type { Lens, LensMetric } from '../config/lenses'
 import type { CityAnalysis, MetricResult, Period } from '../metrics'
 import { periodMonthly } from '../metrics'
 import { fmtNum, fmtP, fmtSigned } from '../format'
+// fmtP and fmtSigned are used by TrendSentence in the chart drawer only
 import { CalendarChart, YearChart } from './YearChart'
 
 export interface PageLabels {
@@ -32,6 +33,11 @@ function Tile({ r, stat, side, onClick, active }: { r: MetricResult; stat: { mea
   )
 }
 
+/** "days too hot to play outside" -> "day too hot to play outside" when n is 1. */
+function singular(phrase: string): string {
+  return phrase.replace(/\b(days|nights)\b/, (w) => w.slice(0, -1))
+}
+
 function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
   const diff = r.diff
   const mm = r.def.unit === 'mm'
@@ -40,23 +46,22 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
   else if (Math.abs(diff) < 0.5) line = `About the same ${mm ? 'biggest downpour' : lm.phrase}.`
   else {
     const n = Math.round(Math.abs(diff))
-    line = mm ? `${n} mm ${diff > 0 ? 'more' : 'less'} in the biggest downpour.` : `${n} ${diff > 0 ? 'more' : 'fewer'} ${lm.phrase}, every year.`
+    const phrase = n === 1 ? singular(lm.phrase) : lm.phrase
+    line = mm ? `${n} mm ${diff > 0 ? 'more' : 'less'} in the biggest downpour.` : `${n} ${diff > 0 ? 'more' : 'fewer'} ${phrase}, every year.`
   }
   const t = r.trend
   const worse = diff !== null && Math.abs(diff) >= 0.5 && (diff > 0) === lm.moreIsBad
+  // One plain line about the long-term trend; the numbers live behind "tap any number".
+  let trendWords = ''
+  if (t) {
+    if (!t.significant) trendWords = 'Ups and downs since 1981, no clear trend.'
+    else trendWords = t.direction === 'up' ? 'Going up steadily since 1981.' : 'Going down steadily since 1981.'
+  }
   return (
     <div className={`note ${worse ? 'worse' : 'better'}`}>
       <p className="line">{line}</p>
       <Verdict r={r} />
-      {t && (
-        <p className="trendline">
-          {fmtSigned(r.slopePerDecade, 1)} {mm ? 'mm' : 'days'} per decade
-          <br />
-          <small>
-            95% CI {fmtSigned(r.ciPerDecade![0], 1)} to {fmtSigned(r.ciPerDecade![1], 1)}, {fmtP(t.p)}
-          </small>
-        </p>
-      )}
+      {trendWords && <p className="trendwords">{trendWords}</p>}
     </div>
   )
 }
@@ -116,7 +121,7 @@ export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; la
         </p>
       )}
       {lens.caveat && <p className="caveat">{lens.caveat}</p>}
-      <p className="hint">Tap any number to see every year since 1981.</p>
+      <p className="hint">Tap any number to see every year since 1981, with the full statistics.</p>
 
       {openR && openLm && (
         <div className="drawer">

@@ -121,7 +121,7 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .note .line { font-family: var(--hand); font-size: 1.45rem; line-height: 1.15; margin: 0 0 0.4rem; font-weight: 700; }
 .note.worse .line { color: var(--worse); }
 .note.better .line { color: var(--better); }
-.note .trendline { margin: 0.4rem 0 0; font-size: 0.85rem; line-height: 1.25; }
+.note .trendwords { margin: 0.45rem 0 0; font-size: 0.92rem; line-height: 1.25; color: var(--ink); }
 .stamp { display: inline-block; font-weight: 800; font-size: 0.72rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.15rem 0.5rem; border: 2px solid currentColor; border-radius: 4px; transform: rotate(-3deg); }
 .stamp.real { color: var(--worse); }
 .stamp.cant, .stamp.none { color: var(--grey); border-style: dashed; }
