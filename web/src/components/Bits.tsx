@@ -29,7 +29,7 @@ export function VerdictCard({ verdict }: { verdict: Verdict }) {
     <section className="folder verdict">
       <Stamp stamp={verdict.stamp} />
       <p className="label">{t('verdictLabel')}</p>
-      <h2>{verdict.headline}</h2>
+      <h2>{pick(verdict.headline, verdict.headline_ar)}</h2>
       <dl className="answers">
         <div><dt>{t('qWhat')}</dt><dd>{pick(verdict.what, verdict.what_ar)}</dd></div>
         <div><dt>{t('qWhere')}</dt><dd>{pick(verdict.where, verdict.where_ar)}</dd></div>

@@ -31,7 +31,7 @@ def build_verdict(var: dict, region_name: str, region_name_ar: str, label: str, 
     y0, y1 = years
     if t is None:
         return {
-            "headline": "No significant trend", "stamp": "INCONCLUSIVE",
+            "headline": "No significant trend", "headline_ar": "لا اتجاه معنوي", "stamp": "INCONCLUSIVE",
             "what": f"{label} in {region_name}", "where": region_name,
             "how_much": "Not enough valid years to test.",
             "significant": "Test not run.",
@@ -84,8 +84,9 @@ def build_verdict(var: dict, region_name: str, region_name_ar: str, label: str, 
         text += " " + extra
     if extra_ar:
         text_ar += " " + extra_ar
+    headline_ar = {"increase": "ارتفاع معنوي", "decrease": "انخفاض معنوي"}[direction] if sig else "لا اتجاه معنوي"
     return {
-        "headline": headline, "stamp": stamp,
+        "headline": headline, "headline_ar": headline_ar, "stamp": stamp,
         "what": f"{label} ({unit})" if unit else label,
         "where": region_name,
         "how_much": how_much,

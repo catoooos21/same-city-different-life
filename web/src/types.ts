@@ -113,6 +113,7 @@ export interface GlobalComparison {
 }
 export interface Verdict {
   headline: 'Significant increase' | 'Significant decrease' | 'No significant trend' | string
+  headline_ar?: string
   stamp: 'CASE CLOSED' | 'INCONCLUSIVE'
   what: string
   where: string

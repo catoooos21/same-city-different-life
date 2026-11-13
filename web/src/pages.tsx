@@ -35,7 +35,7 @@ function CaseCard({ c }: { c: CaseSummary }) {
         ) : f.state === 'ok' ? (
           <>
             <Stamp stamp={f.data.verdict.stamp} />
-            <strong>{f.data.verdict.headline}</strong>
+            <strong>{pick(f.data.verdict.headline, f.data.verdict.headline_ar)}</strong>
             <span className="note">{pick(f.data.verdict.how_much, f.data.verdict.how_much_ar)}</span>
           </>
         ) : (

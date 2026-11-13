@@ -99,6 +99,7 @@ def build() -> dict:
             "correlation": r, "correlation_detrended": rd,
             "variables": [],
             "verdict": {"headline": headline, "stamp": stamp,
+                        "headline_ar": ("ارتباط معنوي" if stamp == "CASE CLOSED" else "لا ارتباط معنوي"),
                         "what": f"Link between {h['label']} and {d['label']} (annual anomalies)",
                         "where": reg.name,
                         "how_much": "" if r is None else f"Pearson r = {r['pearson_r']:+.2f} (95% CI {r['r_ci95'][0]:+.2f} to {r['r_ci95'][1]:+.2f})",
