@@ -202,7 +202,7 @@ export async function loadDaily(lat: number, lon: number, onStatus?: (s: LoadSta
   onStatus?.({ stage: 'cache', message: 'Checking this browser’s cache…' })
   const cached = await cacheGet(key)
   if (cached) return cached
-  onStatus?.({ stage: 'network', message: 'Asking NASA POWER for 45 years of daily weather (about 3 seconds)…' })
+  onStatus?.({ stage: 'network', message: 'Asking NASA for 45 years of daily weather…' })
   const d = await fetchPower(lat, lon, signal)
   await cachePut(key, d)
   return d

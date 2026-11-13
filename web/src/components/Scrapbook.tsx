@@ -117,11 +117,11 @@ export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; la
 
       {hidden.length > 0 && (
         <p className="muted hiddennote">
-          Not shown here because it hardly ever happens in this city: {hidden.map((h) => h.title.toLowerCase()).join(', ')}.
+          Not shown: {hidden.map((h) => h.title.toLowerCase()).join(', ')}. It hardly ever happens here.
         </p>
       )}
       {lens.caveat && <p className="caveat">{lens.caveat}</p>}
-      <p className="hint">Tap any number to see every year since 1981, with the full statistics.</p>
+      <p className="hint">Tap any number to see every year since 1981.</p>
 
       {openR && openLm && (
         <div className="drawer">
@@ -130,7 +130,6 @@ export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; la
           </h4>
           <YearChart r={openR} then={a.then} now={a.now} />
           <TrendSentence r={openR} />
-          <p className="muted">{openR.def.definition}</p>
         </div>
       )}
 
@@ -138,7 +137,7 @@ export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; la
         <div className="drawer calendar">
           <h4>Outdoor calendar: {calMetric!.title.toLowerCase()} per month</h4>
           <CalendarChart then={periodMonthly(calR.monthly, a.then)} now={periodMonthly(calR.monthly, a.now)} labels={{ then: labels.then.years, now: labels.now.years }} />
-          <p className="muted">Average days per month in each period. Months are in calendar order, so a southern-hemisphere summer sits at both ends.</p>
+          <p className="muted">Days per month, then and now.</p>
         </div>
       )}
     </section>
@@ -152,19 +151,25 @@ function ThreeCells({ children, last }: { children: React.ReactNode; last: boole
 export function TrendSentence({ r }: { r: MetricResult }) {
   const t = r.trend
   if (!t) return <p className="muted">Fewer than ten complete years, so no trend test was run.</p>
-  const mm = r.def.unit === 'mm'
+  const unit = r.def.unit === 'mm' ? 'mm' : 'days'
+  const s = r.slopePerDecade!
+  const [lo, hi] = r.ciPerDecade!
+  const dir = s > 0 ? 'up' : 'down'
+  const n = Math.abs(s)
   return (
     <p className="trendsentence">
       {t.significant ? (
         <>
-          <strong>Real change.</strong> The trend is {fmtSigned(r.slopePerDecade, 1)} {mm ? 'mm' : 'days'} per decade (95% confidence interval {fmtSigned(r.ciPerDecade![0], 1)} to {fmtSigned(r.ciPerDecade![1], 1)}), Mann-Kendall {fmtP(t.p)} over {t.n} years.
-          {t.fallback && ' The autocorrelation correction failed on this series, so the plain Mann-Kendall test was used.'}
+          <strong>Real change.</strong> Going {dir} by about {n.toFixed(n < 2 ? 1 : 0)} {unit} every ten years (somewhere between {fmtSigned(lo, 1)} and {fmtSigned(hi, 1)}).
         </>
       ) : (
         <>
-          <strong>Can’t tell.</strong> The year-to-year wobble is too big to be sure of a trend: Sen’s slope is {fmtSigned(r.slopePerDecade, 1)} {mm ? 'mm' : 'days'} per decade, but the 95% confidence interval ({fmtSigned(r.ciPerDecade![0], 1)} to {fmtSigned(r.ciPerDecade![1], 1)}) includes zero and Mann-Kendall gives {fmtP(t.p)} over {t.n} years.
+          <strong>Can’t tell.</strong> The best guess is {fmtSigned(s, 1)} {unit} every ten years, but it could be anywhere between {fmtSigned(lo, 1)} and {fmtSigned(hi, 1)}, so no clear direction.
         </>
-      )}
+      )}{' '}
+      <small className="muted">
+        Trend test: {fmtP(t.p)}, {t.n} years. The dots are each year; the line is the long-term trend.
+      </small>
     </p>
   )
 }

@@ -1,4 +1,5 @@
 import { BASELINE, MAX_MISSING_FRACTION, METRICS, PARAM_INFO, PARAMS, THRESHOLDS, YEARS } from '../config/metrics'
+// BASELINE and THRESHOLDS are used in the "Details for the curious" fold
 import type { Lens } from '../config/lenses'
 import type { CityAnalysis } from '../metrics'
 import type { DailySeries } from '../power'
@@ -23,7 +24,7 @@ export function GlobalContext({ a, cityName }: { a: CityAnalysis; cityName: stri
     <p className="globalline">
       <strong>{words}</strong>{' '}
       <span className="muted small">
-        Here: {fmtSigned(c, 2)} °C per decade since {YEARS.first}. World: {fmtSigned(g, 2)} °C per decade (NASA GISTEMP).
+        Here: {fmtSigned(c, 1)} °C every ten years. World: {fmtSigned(g, 1)} °C (NASA GISTEMP).
       </span>
     </p>
   )
@@ -38,40 +39,29 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
     <details className="methods">
       <summary>How do we know?</summary>
       <div className="methods-body">
-        <h4>Where the numbers come from</h4>
-        <p>
-          NASA keeps a record of the weather for every day since {YEARS.first}, for every place on Earth. It comes from MERRA-2, NASA’s global weather model, which blends satellite and
-          ground measurements. We ask NASA’s <a href="https://power.larc.nasa.gov/">POWER</a> service for this spot and get {YEARS.last - YEARS.first + 1} years of daily
-          temperatures, humidity and rain. One square about 50 km wide stands for the whole city.
-        </p>
-
-        <h4>What counts as “hot” here</h4>
-        <p>
-          We let {cityName} set its own bar, using its weather from {BASELINE.first} to {BASELINE.last}. A hot day here is hotter than <strong>{fmtNum(a.ctx.p90max, 1)} °C</strong>, a hot
-          night stays above <strong>{fmtNum(a.ctx.p90min, 1)} °C</strong>. That is why “hot” means hot for this city, not hot for London.
-        </p>
-
-        <h4>What each card counts</h4>
+        <ul className="simple">
+          <li>
+            <strong>The weather</strong> comes from NASA: its daily weather record for this spot, every day since {YEARS.first}.
+          </li>
+          <li>
+            <strong>“Hot” means hot for {cityName}.</strong> A hot day here is above {fmtNum(a.ctx.p90max, 0)} °C. A hot night stays above {fmtNum(a.ctx.p90min, 0)} °C.
+          </li>
+          <li>
+            <strong>Real change</strong> means {YEARS.last - YEARS.first + 1} years in a row point the same way, and a standard scientific test says it is very unlikely to be luck.
+          </li>
+          <li>
+            <strong>Can’t tell</strong> means the years jump around too much to be sure.
+          </li>
+          <li>
+            <strong>Keep in mind:</strong> this is NASA’s weather model, not a thermometer in your street. Heat is very reliable, rain less so.
+          </li>
+        </ul>
         <ul className="plaindefs">
           {used.map((m) => (
             <li key={m.id}>
-              <strong>{m.name}:</strong> {m.definition.split(/(?<=\.)\s/)[0]}
+              <strong>{m.name}:</strong> {m.plain ?? m.definition.split(/(?<=\.)\s/)[0]}
             </li>
           ))}
-        </ul>
-
-        <h4>Real change, or can’t tell?</h4>
-        <p>
-          For each card we line up one number per year, {YEARS.last - YEARS.first + 1} years in a row, and run a standard trend test used by climate scientists. If a trend that strong would
-          show up by pure luck less than 5 times in 100, we stamp it <strong>Real change</strong>. If not, we say <strong>Can’t tell</strong>: there may still be a trend, but the years
-          bounce around too much to be sure. “Then” and “Now” are simple averages of the years in each period.
-        </p>
-
-        <h4>Keep in mind</h4>
-        <ul>
-          <li>This is a model’s view of the weather, not a thermometer in your street. Temperature and humidity trends are very reliable; rain at one spot is less certain.</li>
-          <li>Two people born close together share years, so their difference looks smaller than the long-term trend.</li>
-          <li>The outdoor-worker cards are a weather proxy, not a safety standard.</li>
         </ul>
 
         <details className="details-more">
@@ -114,6 +104,9 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
           </p>
           <h5>Limits</h5>
           <ul>
+            <li>MERRA-2 is a reanalysis: a model that assimilates satellite and ground observations. Temperature and humidity trends are robust; precipitation at a point is less certain.</li>
+            <li>Two people born close together share years, so their difference looks smaller than the long-term trend.</li>
+            <li>The outdoor-worker lens is a weather proxy, not an occupational safety standard.</li>
             <li>Reanalyses can show small artificial jumps when the satellites they assimilate change.</li>
             <li>Coastal cities may sit in a grid cell that is partly sea, which cools the absolute numbers.</li>
             <li>Forty-five years is long for temperature counts, short for rare events such as the biggest downpour.</li>

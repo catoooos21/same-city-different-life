@@ -55,7 +55,7 @@ export const LENSES: Lens[] = [
       { metric: 'heatwave_days', title: 'Heatwave days', phrase: 'heatwave days', moreIsBad: true },
       { metric: 'sticky_days', title: 'Sticky, muggy days', phrase: 'sticky days', moreIsBad: true },
     ],
-    caveat: 'These counts are a weather proxy for heat stress, not a workplace safety standard. They say nothing about shade, workload, clothing or breaks.',
+    caveat: 'Weather only. This is not a workplace safety standard.',
   },
   {
     id: 'farmer',

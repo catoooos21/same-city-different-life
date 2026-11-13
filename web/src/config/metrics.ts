@@ -65,6 +65,8 @@ export interface MetricDef {
   id: string
   /** Neutral name shown in the methods panel. */
   name: string
+  /** One short everyday-words line for the simple panel. */
+  plain?: string
   /** Unit of the annual value. */
   unit: 'days' | 'mm'
   /** Which POWER parameters a day needs; a day missing any of them is a missing day. */
@@ -84,6 +86,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'hot_days',
     name: 'Hot days',
+    plain: 'Hotter than 9 days out of 10 were here in 1981–2010.',
     unit: 'days',
     needs: ['T2M_MAX'],
     definition: `Days whose maximum temperature is above this city's ${T.hotPercentile}th percentile of daily maxima over ${BASELINE.first}-${BASELINE.last} (all days of the year pooled, so this is a local "hot for here"). Related to ETCCDI TX90p, which uses a calendar-day percentile instead.`,
@@ -93,6 +96,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'very_hot_days',
     name: 'Very hot days',
+    plain: '35 °C or hotter.',
     unit: 'days',
     needs: ['T2M_MAX'],
     definition: `Days with a maximum temperature of ${T.veryHotMaxC} °C or more. Shown only where it happens (baseline average of at least one day a year).`,
@@ -102,6 +106,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'hot_nights',
     name: 'Hot nights',
+    plain: 'Warmer at night than 9 nights out of 10 were here in 1981–2010.',
     unit: 'days',
     needs: ['T2M_MIN'],
     definition: `Nights whose minimum temperature is above this city's ${T.hotPercentile}th percentile of daily minima over ${BASELINE.first}-${BASELINE.last}. Related to ETCCDI TN90p.`,
@@ -111,6 +116,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'tropical_nights',
     name: 'Tropical nights',
+    plain: 'The night never drops below 20 °C.',
     unit: 'days',
     needs: ['T2M_MIN'],
     definition: `Nights whose minimum temperature stays at ${T.tropicalNightMinC} °C or above. Shown only where it happens.`,
@@ -121,6 +127,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'heatwave_days',
     name: 'Heatwave days',
+    plain: 'Three or more hot days in a row.',
     unit: 'days',
     needs: ['T2M_MAX'],
     definition: `Days inside a run of at least ${T.heatwaveRunDays} consecutive hot days (hot = above the local ${T.hotPercentile}th percentile). Runs may cross New Year, so southern-hemisphere summers are counted correctly; each day counts in its own year.`,
@@ -129,6 +136,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'frost_days',
     name: 'Frost days',
+    plain: 'Below 0 °C at night.',
     unit: 'days',
     needs: ['T2M_MIN'],
     definition: `Days whose minimum temperature is below ${T.frostMinC} °C. Shown only where it happens.`,
@@ -139,6 +147,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'rainy_days',
     name: 'Rainy days',
+    plain: 'At least 1 mm of rain.',
     unit: 'days',
     needs: ['PRECTOTCORR'],
     definition: `Days with at least ${T.rainyDayMm} mm of precipitation.`,
@@ -148,6 +157,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'heavy_rain_days',
     name: 'Heavy rain days',
+    plain: 'At least 10 mm of rain.',
     unit: 'days',
     needs: ['PRECTOTCORR'],
     definition: `Days with at least ${T.heavyRainMm} mm of precipitation.`,
@@ -157,6 +167,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'biggest_downpour',
     name: 'Biggest downpour',
+    plain: 'Rain on the wettest day of the year.',
     unit: 'mm',
     needs: ['PRECTOTCORR'],
     definition: 'Precipitation on the wettest day of the year, in mm.',
@@ -166,6 +177,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'longest_dry_spell',
     name: 'Longest dry spell',
+    plain: 'Most days in a row without rain.',
     unit: 'days',
     needs: ['PRECTOTCORR'],
     definition: `Longest run of consecutive days with less than ${T.rainyDayMm} mm of precipitation within the calendar year.`,
@@ -175,6 +187,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'sticky_days',
     name: 'Sticky days',
+    plain: 'Muggy air: dew point 20 °C or more.',
     unit: 'days',
     needs: ['T2MDEW'],
     definition: `Days whose mean dew point is ${T.stickyDewC} °C or above (air that feels muggy).`,
@@ -183,6 +196,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'perfect_days',
     name: 'Perfect outdoor days',
+    plain: '18–30 °C, dry, not muggy.',
     unit: 'days',
     needs: ['T2M_MAX', 'PRECTOTCORR', 'T2MDEW'],
     definition: `Days with a maximum temperature between ${T.perfect.maxLow} and ${T.perfect.maxHigh} °C, less than ${T.perfect.rainBelowMm} mm of precipitation and a dew point below ${T.perfect.dewBelowC} °C. Our own thresholds, inspired by the "outdoor days" idea of Choi, Khalifa and Eltahir (2024).`,
@@ -195,6 +209,7 @@ export const METRICS: MetricDef[] = [
   {
     id: 'training_days',
     name: 'Good training days',
+    plain: '5–20 °C, dry, not muggy.',
     unit: 'days',
     needs: ['T2M', 'PRECTOTCORR', 'T2MDEW'],
     definition: `Days with a mean temperature between ${T.training.meanLow} and ${T.training.meanHigh} °C, less than ${T.training.rainBelowMm} mm of precipitation and a dew point below ${T.training.dewBelowC} °C.`,

@@ -154,7 +154,10 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .methods-body { padding: 0 1.2rem 1.2rem; }
 .methods-body h4 { font-family: var(--hand); font-size: 1.4rem; margin-top: 1rem; }
 .methods-body code { background: #efe6d2; padding: 0 0.3rem; border-radius: 3px; }
-.plaindefs li { margin-bottom: 0.3rem; }
+.simple { padding-left: 1.2rem; font-size: 1.05rem; }
+.simple li { margin-bottom: 0.5rem; }
+.plaindefs { padding-left: 1.2rem; font-size: 0.9rem; color: var(--muted); }
+.plaindefs li { margin-bottom: 0.2rem; }
 .details-more { margin-top: 1.2rem; border-top: 1px dashed #c9b995; padding-top: 0.6rem; }
 .details-more > summary { font-weight: 800; cursor: pointer; color: var(--muted); }
 .details-more h5 { font-family: var(--hand); font-size: 1.2rem; margin: 0.9rem 0 0.2rem; }

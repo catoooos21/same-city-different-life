@@ -62,15 +62,13 @@ export default function App() {
         <h1 onClick={() => set({ city: null })} role="link" tabIndex={0}>
           Same City, Different Life
         </h1>
-        <p className="tagline">Two lives in the same city, decades apart, told by 45 years of NASA weather data.</p>
+        <p className="tagline">Two lives in the same city, years apart. Told by NASA weather data.</p>
       </header>
 
       {!q.city ? <Home q={q} set={set} /> : <Result q={q} set={set} daily={daily} analysis={analysis} status={status} error={error} lens={lens} then={then} now={now} />}
 
       <footer>
-        <p>
-          Built for the NASA Space Apps Challenge 2026, “Be An Earth System Trend Detective!”. Data: NASA POWER (MERRA-2), NASA GISTEMP. Cities: GeoNames (CC BY 4.0). No NASA endorsement implied.
-        </p>
+        <p>NASA Space Apps Challenge 2026. Weather: NASA POWER (MERRA-2). World temperature: NASA GISTEMP. Cities: GeoNames (CC BY 4.0).</p>
       </footer>
     </div>
   )
@@ -84,7 +82,7 @@ function Home({ q, set }: { q: Query; set: (p: Partial<Query>) => void }) {
       <div className="hero">
         <h2>Two childhoods</h2>
         <p className="story">
-          A kid born in <strong>{q.b1}</strong> and a kid born in <strong>{q.b2}</strong>, in the same city, the first ten years of their lives.
+          One kid born in <strong>{q.b1}</strong>. One born in <strong>{q.b2}</strong>. Same city.
           <br />
           <em>Same city. Same age. A different childhood.</em>
         </p>
@@ -136,9 +134,7 @@ function Home({ q, set }: { q: Query; set: (p: Partial<Query>) => void }) {
           </button>
         ))}
       </p>
-      <p className="muted small">
-        Any city on Earth works: the page asks NASA POWER for that spot’s daily weather since 1981 and does the statistics in your browser. The four demo cities are bundled so they open instantly.
-      </p>
+      <p className="muted small">Any city on Earth works. The weather comes straight from NASA.</p>
     </section>
   )
 }
