@@ -1,21 +1,7 @@
-# Pipeline dependencies -- Python 3.11
-earthaccess>=0.12
-xarray>=2024.6
-netCDF4>=1.7
-h5netcdf>=1.3
-h5py>=3.11
-dask[array]>=2024.6
+# Python reference implementation + fixture generation -- Python 3.11
 numpy>=1.26,<3
 pandas>=2.2
 scipy>=1.13
 pymannkendall>=1.4.3
-statsmodels>=0.14
-geopandas>=1.0
-shapely>=2.0
-pyproj>=3.6
-regionmask>=0.12
-matplotlib>=3.9
 requests>=2.32
-pyyaml>=6.0
-tabulate>=0.9
 pytest>=8.2

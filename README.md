@@ -1,125 +1,154 @@
-# Ghubar Holmes: Kuwait Trend Detective
+# Same City, Different Life
 
-*NASA Space Apps Challenge 2026, Kuwait local event (AUK, 14-15 Nov 2026).*
-*Challenge: "Be An Earth System Trend Detective!" (Advanced, Earth Science + Software).*
+*NASA Space Apps Challenge 2026, 14–15 November. Challenge: “Be An Earth System Trend Detective!” (Advanced; Earth Science + Software). Official text in [docs/challenge.md](docs/challenge.md).*
 
-**Summary.** Ghubar Holmes ("ghubar" is Arabic for dust) is a public web app where anyone can open a
-case file about Kuwait's environment and get a plain-language verdict backed by real NASA data and
-real statistics. Each case answers four questions: **what** is changing, **where**, **how much**,
-and **whether the change is statistically significant**. We use MODIS and MERRA-2 variables over
-2001-2025 (land) and 2003-2025 (sea), remove seasonality with monthly anomalies, test trends with
-the Mann-Kendall test (autocorrelation-corrected) and Sen's slope, and map per-pixel trends with a
-false-discovery-rate correction. It should be fun to use and honest about what the data can and
-cannot say. Every number on screen is produced by the pipeline in this repository from NASA data;
-nothing is hand-typed or simulated.
+Pick any city on Earth and compare daily life there in two periods, using 45 years of NASA weather data.
+The opening story is **Two Childhoods**: a kid born in 1981 and a kid born in 2015, same city, first ten
+years of life. *Same city. Same age. A different childhood.* Then switch the life being compared: kid,
+outdoor worker, farmer, runner, older person, traveller. Same data, different numbers.
 
-## The cases
+It is not a dashboard and not a globe. It looks like two scrapbook pages side by side, with sticky notes
+between them saying what changed, and a stamp saying whether the change is real.
 
-| Case | Question | Verdict (filled by the pipeline) |
-|------|----------|----------------------------------|
-| Heat | Is Kuwait heating up, and faster than the world? | **Significant increase**: +0.53 °C per decade (95% CI +0.29 to +0.76), +1.27 °C over 2001-2025, p < 0.001, 25 years. About 2.1x the GISTEMP global rate (+0.25 °C/decade). *Currently from the NASA POWER fallback (MERRA-2 T2M served by POWER); MODIS LST pending Earthdata login.* |
-| Dust | Is Kuwait getting dustier? | **No significant trend**: +0.015 AOD per decade (95% CI -0.012 to +0.059), p = 0.25. *Currently total AOD from NASA POWER (CERES SYN1deg) as a labelled fallback; MERRA-2 dust-only and MODIS Deep Blue pending Earthdata login.* |
-| Sea | Is the water around Kuwait getting warmer and greener? | *pending Earthdata login (MODIS Aqua has no login-free fallback)* |
-| Connected | Do hotter years bring more dust? | **No significant correlation** between annual temperature and dust anomalies (Pearson r = +0.07, p = 0.74; detrended r = -0.09). Correlation is not causation. |
+For every number the app answers the four challenge questions:
 
-Each verdict reports: what changed, where (map), how much (Sen's slope per decade, total change,
-% vs baseline) and whether it is significant (p-value, number of years).
+| Question | Where it is answered |
+|---|---|
+| **What** is changing | each lens is a list of plain-language metrics (hot days, nights too hot to sleep, rainy days, perfect outdoor days, …) |
+| **Where** | any city (GeoNames, population > 100,000) or any coordinates; the MERRA-2 grid cell for that point |
+| **How much** | Then vs Now averages, their difference, and Sen’s slope per decade with a 95 % confidence interval |
+| **Significant?** | Mann-Kendall test with the Hamed–Rao autocorrelation correction, shown as **Real change** (p < 0.05) or **Can’t tell** |
 
-## Status (build log)
+## Try it
 
-- [x] **Step 1** Repo scaffold, dataset check against NASA CMR, stats module with unit tests.
-      See [docs/datasets_cmr_check.md](docs/datasets_cmr_check.md) for the availability table.
-- [x] **Step 2** Heat case end-to-end (pipeline -> JSON -> web page with verdict, charts, map). Running on the
-      labelled NASA POWER fallback until Earthdata Login is configured. Deploy: GitHub Pages workflow ready,
-      waiting for a remote.
-- [x] **Step 3** Dust case (fallback for now; MERRA-2 dust + MODIS cross-check wired, need login).
-- [ ] Step 4 Sea case (code written in `pipeline/cases/sea.py`; needs Earthdata login).
-- [x] **Step 5** Per-pixel trend maps with BH-FDR (`data/processed/maps/`).
-- [x] **Step 6** Month x year heat strip, per-month trends, region picker (All Kuwait, Kuwait City metro, Jahra, Ahmadi).
-- [x] **Step 7** Connected case (Pearson + Spearman + detrended correlation).
-- [ ] Step 8 Polish, team names, final deploy with Earthdata data.
-
-## Study area and period
-
-- Land box: lon 46.5-48.5 E, lat 28.5-30.1 N, masked to Kuwait's border
-  (Natural Earth admin-0). Governorates from geoBoundaries ADM1.
-- Sea box: lon 47.6-49.0 E, lat 28.5-30.0 N, ocean pixels only.
-- Full calendar years only. Land 2001-2025, sea 2003-2025. 2026 may be shown greyed out and is
-  never used in a trend test.
-
-## Datasets (verified against CMR on 2026-11-13)
-
-| Short name | Version in CMR | Variables | Role | DOI |
-|------------|----------------|-----------|------|-----|
-| MOD11C3 (MODIS Terra, LP DAAC) | 061 | LST_Day_CMG, LST_Night_CMG | Monthly land surface temperature, 0.05 deg | 10.5067/MODIS/MOD11C3.061 |
-| M2TMNXSLV (MERRA-2, GES DISC) | 5.12.4 | T2M, T2MMAX, T2MMIN | Monthly 2 m air temperature | 10.5067/AP1B0BA5PD2K |
-| M2TMNXAER (MERRA-2, GES DISC) | 5.12.4 | DUEXTTAU, DUSMASS, TOTEXTTAU | Monthly dust optical depth and surface concentration | 10.5067/FH9A0MLJPC7N |
-| MOD08_M3 (MODIS Terra, LAADS) | 6.1 (CMR lists Collection 6.1 as "6.1", not "061") | Deep Blue AOD 550 nm over land | Satellite cross-check of MERRA-2 dust | 10.5067/MODIS/MOD08_M3.061 |
-| MODISA_L3m_SST (MODIS Aqua, OB.DAAC) | R2019.0 | sst | Monthly 4 km sea surface temperature | 10.5067/AQUA/MODIS/L3M/SST/2019 |
-| MODISA_L3m_CHL (MODIS Aqua, OB.DAAC) | 2022.0 | chlor_a | Monthly 4 km chlorophyll-a | 10.5067/AQUA/MODIS/L3M/CHL/2022 |
-| M2C0NXASM (MERRA-2 constants) | 5.12.4 | FRLAND, FROCEAN | Land/ocean mask on the MERRA-2 grid | 10.5067/ME5QX6Q5IGGU |
-| GISTEMP v4 (NASA GISS) | - | GLB.Ts+dSST.csv | Global annual mean for the "vs the world" comparison | data.giss.nasa.gov/gistemp |
-
-Fallback (only while Earthdata access is unavailable, and labelled in the app and in `index.json`):
-NASA POWER regional monthly API. POWER's T2M / T2M_MAX are MERRA-2 values on the native MERRA-2
-grid; POWER's AOD_55 is *total* aerosol optical depth from CERES SYN1deg, not MERRA-2 dust, so the
-dust fallback is clearly marked as a stand-in.
-
-Notes from the CMR check: all collections exist and have every expected monthly granule for our
-years and area. MODISA_L3m_CHL returns duplicate metadata records for months from July 2021
-onward (same file, two CMR records); the pipeline dedupes by filename.
-
-## Methods
-
-1. **Regional series.** Area-weighted (cos latitude) mean over the AOI with a land-only or
-   ocean-only mask.
-2. **Seasonality removed.** Monthly anomalies against a 2001-2010 climatology (sea: 2003-2012).
-3. **Trend test on annual means.** Mann-Kendall with the Hamed-Rao autocorrelation correction
-   (`pymannkendall.hamed_rao_modification_test`). Magnitude: Sen's slope with 95 % CI
-   (`scipy.stats.theilslopes`).
-4. **Monthly check.** Seasonal Kendall test (period 12) on the monthly anomalies, plus a trend per
-   calendar month for the month x year heat strip.
-5. **Maps.** MK + Sen's slope on each grid cell's annual series, then Benjamini-Hochberg FDR
-   (q = 0.05) across cells. Only FDR-significant cells are drawn solid; the rest are faded.
-6. **Verdicts.** "Significant increase", "Significant decrease" or "No significant trend
-   (we can't tell)" at alpha = 0.05, with slope per decade, total change, % change vs baseline,
-   p-value and number of years.
-7. **Chlorophyll** is analysed as log10(chl) because it is log-normally distributed.
-8. **Connected case.** Pearson and Spearman correlation of annual dust vs temperature anomalies with
-   a 95 % CI on r. Correlation is not causation and the app says so.
-
-The statistics module is unit-tested with synthetic series of known slope
-(`pipeline/tests/test_stats.py`). Synthetic data is used only in tests.
-
-## Limitations (also shown in the app)
-
-- MERRA-2 is a model (reanalysis). Changes in the observations it assimilates can create
-  artificial jumps, so we cross-check dust against MODIS Deep Blue aerosol optical depth.
-- Land surface temperature is not air temperature. The heat case shows both.
-- Gulf water is sediment-rich, so MODIS chlorophyll is biased high. We trust trends in anomalies,
-  not absolute values.
-- 25 (land) and 23 (sea) years is a short record for climate trends; confidence intervals are wide
-  and we report them.
-- Correlation is not causation (Connected case).
-
-## How to rebuild
+Demo cities (Kuwait City, London, Sydney, Delhi) are bundled and open instantly. Any other city is fetched
+live from NASA POWER in about three seconds and cached in the browser.
 
 ```bash
-# Python 3.11
-python -m venv .venv
-.venv/Scripts/pip install -r requirements.txt      # on Linux/macOS: .venv/bin/pip
-python -m pipeline.check_datasets                  # verify datasets against NASA CMR (no login)
-python -m pytest pipeline/tests                    # stats unit tests
-python -m pipeline.build_all                       # (step 2+) fetch, analyse, write data/processed
-cd web && npm install && npm run dev               # (step 2+) web app
+cd web
+npm install
+npm run dev
 ```
 
-Earthdata Login is needed from step 2 onward. Put it in `~/.netrc` (`machine urs.earthdata.nasa.gov
-login USER password PASS`) or in the `EARTHDATA_USERNAME` / `EARTHDATA_PASSWORD` environment
-variables. Credentials are never committed (see `.gitignore`).
+Every result has a shareable URL, for example `#name=Kuwait+City&lat=29.3759&lon=47.9774&mode=child&b1=1981&b2=2015&lens=kid`.
 
-Raw NASA subsets are cached in `data/raw/` (gitignored). Small processed outputs in
-`data/processed/` are committed, so the web app runs fully offline from static files.
+## NASA data
+
+**NASA POWER daily point API** (no key, no login): meteorology from NASA’s **MERRA-2** reanalysis, the
+model the challenge text names explicitly. Six daily parameters, 1981-01-01 to 2025-12-31:
+`T2M_MAX`, `T2M_MIN`, `T2M`, `T2MDEW`, `PRECTOTCORR`, `RH2M`.
+
+Before writing any code we made a real request and checked the API ([web/src/power.ts](web/src/power.ts) records the findings):
+
+| Check | Found on 2026-11-13 |
+|---|---|
+| Units | °C for temperatures and dew point, mm/day for precipitation, % for humidity |
+| Missing value | `-999` (declared as `fill_value` in the header) |
+| Date range | starts exactly 1981-01-01 (earlier dates give HTTP 422); runs to three days before today |
+| Parameter limit | 20 per request (we need 6) |
+| CORS | `Access-Control-Allow-Origin: *` on GET, so the browser calls POWER directly |
+| Size and time | 16,436 days, about 1.6 MB and 3 s for six parameters over 45 years |
+| Time standard | local solar time, so daily max/min are true local days |
+
+Rules applied everywhere: full calendar years 1981–2025 only, never 2026; a year is dropped for a metric
+when more than 10 % of its days are missing; leap days count like any other day.
+
+**NASA GISTEMP v4** global annual mean (land-ocean) gives the “vs the world” line under the scrapbooks.
+
+**City search**: GeoNames cities with population > 100,000 (6,266 cities; name, country, lat, lon), CC BY 4.0.
+
+## Metrics (all thresholds live in one file)
+
+Defined in [web/src/config/metrics.ts](web/src/config/metrics.ts) and printed verbatim in the app’s “How do we know?” panel.
+Local thresholds use each city’s own 1981–2010 baseline, so “hot” means hot for that place.
+
+| Metric | Definition | ETCCDI |
+|---|---|---|
+| Hot days | daily max > city’s 90th percentile of baseline daily max | TX90p (whole-year percentile variant) |
+| Very hot days | daily max ≥ 35 °C (shown only where it happens) | |
+| Hot nights | daily min > city’s 90th percentile of baseline daily min | TN90p (variant) |
+| Tropical nights | daily min ≥ 20 °C (shown only where it happens) | TR |
+| Heatwave days | days inside runs of ≥ 3 consecutive hot days; runs may cross New Year (Southern Hemisphere) | |
+| Frost days | daily min < 0 °C (shown only where it happens) | FD |
+| Rainy days | precipitation ≥ 1 mm | R1mm |
+| Heavy rain days | precipitation ≥ 10 mm | R10mm |
+| Biggest downpour | wettest day of the year, mm | Rx1day |
+| Longest dry spell | most consecutive days < 1 mm within the year | CDD |
+| Sticky days | daily mean dew point ≥ 20 °C | |
+| Perfect outdoor days | max 18–30 °C, precipitation < 1 mm, dew point < 20 °C | |
+| Good training days | mean 5–20 °C, precipitation < 1 mm, dew point < 16 °C | |
+
+“Perfect outdoor days” follows the “outdoor days” idea of Choi, Y.-W., Khalifa, M. and Eltahir, E. A. B.
+(2024), *North–South disparity in impact of climate change on “outdoor days”*, Journal of Climate,
+[doi:10.1175/JCLI-D-23-0346.1](https://doi.org/10.1175/JCLI-D-23-0346.1). Their thresholds are
+temperature-only and user-adjustable; ours add rain and humidity and are our own.
+
+The outdoor calendar shows perfect outdoor days per month, Then vs Now.
+
+## Lenses (“Who are you?”)
+
+Defined in [web/src/config/lenses.ts](web/src/config/lenses.ts). Adding a lens is a config change only.
+
+| Lens | Metrics |
+|---|---|
+| Kid / parent | too hot to play (hot days), too hot to sleep (hot nights), rainy days, sticky days, perfect play days, outdoor calendar |
+| Outdoor worker | very hot workdays, hot days, heatwave days, sticky days — labelled as a weather proxy, not a safety standard |
+| Farmer / gardener | longest dry spell, heavy rain days, biggest downpour, frost days, rainy days |
+| Runner / athlete | good training days, hot days, sticky days, calendar |
+| Older person | hot nights, tropical nights, heatwave days, very hot days |
+| Traveller / event planner | perfect outdoor days, rainy days, very hot days, outdoor calendar |
+
+Modes: **Two childhoods** (birth year b → years b to b+9; birth years 1981–2016) and **Any two periods**
+(default 1981–1990 vs 2016–2025).
+
+## Statistics
+
+For each city and metric the app builds one value per year, 1981–2025, then:
+
+- **Trend test**: Mann-Kendall with the Hamed and Rao (1998) variance correction for autocorrelation.
+  If the correction produces a non-finite variance the plain test is used and the panel says so.
+- **Slope**: Sen’s slope (median of pairwise slopes) with a 95 % confidence interval (Sen 1968, eq. 2.6).
+- **Report**: change per decade with CI, the average per year in each period, the difference between the
+  periods, the p-value, the number of complete years, and the label *Real change* (p < 0.05) or *Can’t tell*.
+  A “Can’t tell” still shows the slope: a trend can be interesting without reaching significance.
+
+The statistics run in the browser ([web/src/stats.ts](web/src/stats.ts)). They are a line-by-line port of
+`pymannkendall.hamed_rao_modification_test` and `scipy.stats.theilslopes`, and
+[web/src/__tests__/stats.test.ts](web/src/__tests__/stats.test.ts) checks them against values produced by
+those Python packages on eight reference series (noise, ties, AR(1) autocorrelation, gaps, mostly zeros,
+and the real Kuwait hot-days series). The Python reference lives in [pipeline/stats.py](pipeline/stats.py);
+regenerate the fixtures with `python -m pipeline.tests.make_js_fixtures`.
+
+```bash
+cd web && npm test            # 46 tests: statistics vs Python, calendar, metrics engine, missing-day rule
+python -m pytest pipeline/tests   # Python reference tests
+```
+
+## Limits (also shown in the app)
+
+- MERRA-2 is a model fed by observations, not a thermometer. Temperature and humidity trends are robust;
+  precipitation at one point is less certain even in the bias-corrected product.
+- One grid cell (about 50 km) stands for a whole city. Coastal cells may be partly sea.
+- Reanalyses can show small artificial jumps when the assimilated satellites change.
+- Two childhoods less than ten years apart share years, which makes their difference smaller, not larger.
+- The outdoor-worker lens is a weather proxy, not an occupational safety standard.
+
+## Repository
+
+```
+web/                    Vite + React + TypeScript app (static; deploys to GitHub Pages)
+  src/config/           metrics.ts (thresholds, definitions), lenses.ts (who-are-you lists)
+  src/stats.ts          Mann-Kendall (Hamed-Rao), Sen's slope + CI, percentile
+  src/metrics.ts        daily -> annual series, runs, calendar, periods
+  src/power.ts          NASA POWER client + IndexedDB cache + demo loader
+  src/components/       CitySearch, Scrapbook, YearChart, Methods
+  public/cities.json    GeoNames cities > 100k (built by scripts/build_cities.py)
+  public/demo/          four bundled cities (scripts/fetch_demo_cities.py)
+pipeline/stats.py       Python reference statistics + tests, fixture generator
+docs/challenge.md       official challenge text
+```
+
+Deploy: the GitHub Pages workflow in `.github/workflows/pages.yml` builds `web/` on every push to `main`.
 
 ## Team
 
@@ -128,19 +157,15 @@ Raw NASA subsets are cached in `data/raw/` (gitignored). Small processed outputs
 ## Use of AI
 
 Space Apps asks teams to disclose how AI tools were used. This project was built as a pair-programming
-session between the team and Claude (Anthropic) in Claude Code:
+session between the team and Claude (Anthropic) in Claude Code, following a brief written by the team:
 
-- Claude wrote the initial repo scaffold, the CMR dataset checker, the statistics module and its
-  unit tests, the data pipeline (Earthdata access, NASA POWER fallback, region masks, case builders),
-  the React web app, and drafts of this README, following a brief written by the team.
-- The verdict sentences are templates filled with computed numbers; no AI model generates or
-  interprets results at run time.
-- Every dataset short name and version was verified programmatically against NASA CMR, not taken
-  from the AI's memory. Where the AI's assumption was wrong (MOD08_M3 version string) the CMR result
-  was used.
-- All numbers in the app come from the pipeline running on NASA data. No AI-generated or synthetic
-  values appear in the app.
-- The team reviewed the methods, chose the statistical tests and limitations, and is responsible
+- Claude made the first real NASA POWER request and reported the API’s units, fill value, date limits,
+  parameter limit and CORS behaviour before any code was written; the design was adapted to those facts.
+- Claude wrote the web app, the JavaScript statistics port and its tests against the Python packages, the
+  metric and lens configuration, the city-list and demo-fetch scripts, and drafts of this README.
+- Every number on screen is computed in the browser from NASA POWER data. The sentences on the sticky
+  notes are templates filled with computed numbers; no AI model runs at any point in the app.
+- The team chose the concept, the metrics, the statistical tests and the limitations, and is responsible
   for the scientific interpretation.
 
 No NASA logos or insignia are used.
