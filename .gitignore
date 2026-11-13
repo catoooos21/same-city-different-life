@@ -1,0 +1,29 @@
+# Credentials -- never commit
+.netrc
+_netrc
+.env
+.env.*
+*.netrc
+
+# Raw NASA subsets (large, rebuildable)
+data/raw/
+!data/raw/.gitkeep
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# Node / web
+web/node_modules/
+web/dist/
+web/.vite/
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
