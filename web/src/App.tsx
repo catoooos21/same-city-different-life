@@ -235,6 +235,7 @@ function Result(props: {
           {cityName}
         </h2>
         <p className="intro">{lens.intro}</p>
+        <OverlapHint then={then} now={now} set={set} />
       </div>
 
       {error && (
@@ -274,6 +275,23 @@ function Result(props: {
         </>
       )}
     </section>
+  )
+}
+
+/** When the two periods overlap, say so: the differences will be small by construction. */
+function OverlapHint({ then, now, set }: { then: { first: number; last: number }; now: { first: number; last: number }; set: (p: Partial<Query>) => void }) {
+  const lo = Math.max(then.first, now.first)
+  const hi = Math.min(then.last, now.last)
+  const shared = hi - lo + 1
+  if (shared <= 0) return null
+  const len = Math.min(then.last - then.first + 1, now.last - now.first + 1)
+  return (
+    <p className="overlap">
+      These two lives share {shared} of their {len} years, so the differences are small.{' '}
+      <button type="button" className="linkish" onClick={() => set({ mode: 'child', b1: BIRTH_YEARS.first, b2: 2015 })}>
+        Try 1981 vs 2015
+      </button>
+    </p>
   )
 }
 
