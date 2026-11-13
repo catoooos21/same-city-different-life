@@ -5,6 +5,7 @@ import type { CityAnalysis } from '../metrics'
 import type { DailySeries } from '../power'
 import { fmtNum, fmtSigned } from '../format'
 import gistemp from '../data/gistemp.json'
+import { FUTURE_BIRTH_YEAR, PACE_LINE, PACE_SOURCE } from '../config/context'
 import { annualTrend } from '../stats'
 
 const gistempTrend = annualTrend(gistemp.years, gistemp.values)
@@ -21,12 +22,20 @@ export function GlobalContext({ a, cityName }: { a: CityAnalysis; cityName: stri
   else if (ratio !== null && ratio >= 0.75) words = `${cityName} is warming at about the same pace as the world as a whole.`
   else words = `${cityName} is warming more slowly than the world as a whole.`
   return (
-    <p className="globalline">
-      <strong>{words}</strong>{' '}
-      <span className="muted small">
-        Here: {fmtSigned(c, 1)} °C every ten years. World: {fmtSigned(g, 1)} °C (NASA GISTEMP).
-      </span>
-    </p>
+    <div className="globalline">
+      <p>
+        <strong>{words}</strong>{' '}
+        <span className="muted small">
+          Here: {fmtSigned(c, 1)} °C every ten years. World: {fmtSigned(g, 1)} °C (NASA GISTEMP).
+        </span>
+      </p>
+      <p className="pace">
+        {PACE_LINE}{' '}
+        <a className="small" href={PACE_SOURCE.url}>
+          ({PACE_SOURCE.label})
+        </a>
+      </p>
+    </div>
   )
 }
 
@@ -51,6 +60,10 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
           </li>
           <li>
             <strong>No clear change</strong> means some years go up, some go down, and 45 years show no steady direction.
+          </li>
+          <li>
+            <strong>Born {FUTURE_BIRTH_YEAR}, if it keeps going</strong> stretches the straight trend line into the future. It is a “what if”, not a forecast, and only appears where the
+            change is real.
           </li>
           <li>
             <strong>Keep in mind:</strong> this is NASA’s weather model, not a thermometer in your street. Heat is very reliable, rain less so.

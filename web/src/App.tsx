@@ -7,6 +7,7 @@ import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from
 import { CitySearch } from './components/CitySearch'
 import { Scrapbook, periodLabel, type PageLabels } from './components/Scrapbook'
 import { GlobalContext, Methods } from './components/Methods'
+import { WhyPanel } from './components/Context'
 
 const years = (a: number, b: number) => Array.from({ length: b - a + 1 }, (_, i) => a + i)
 
@@ -256,6 +257,7 @@ function Result(props: {
         <>
           <Scrapbook a={analysis} lens={lens} labels={labels} />
           <GlobalContext a={analysis} cityName={city.name} />
+          <WhyPanel country={city.country} cityName={city.name} then={then} now={now} />
           <Methods a={analysis} d={daily} lens={lens} cityName={city.name} />
           <p className="share">
             <button

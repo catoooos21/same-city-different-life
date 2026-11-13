@@ -150,6 +150,21 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .trendsentence { margin: 0.6rem 0 0.3rem; }
 
 .globalline { background: var(--paper-then); padding: 0.7rem 1rem; margin-top: 1.2rem; box-shadow: var(--shadow); transform: rotate(0.4deg); }
+.globalline p { margin: 0; }
+.globalline .pace { margin-top: 0.5rem; font-family: var(--hand); font-size: 1.35rem; line-height: 1.2; color: var(--accent); }
+.globalline .pace a { font-family: var(--body); color: var(--muted); }
+.note .future { margin: 0.4rem 0 0; font-size: 0.9rem; border-top: 1px dashed rgba(0,0,0,0.2); padding-top: 0.3rem; }
+
+.why { background: var(--paper-now); box-shadow: var(--shadow); padding: 1rem 1.2rem 1.2rem; margin-top: 1.2rem; }
+.why h3 { font-family: var(--hand); font-size: 1.8rem; }
+.why h4 { font-family: var(--hand); font-size: 1.35rem; margin-top: 0.9rem; }
+.clippings { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0.8rem; }
+.clipping { background: #fffdf7; border: 1px solid #d9cba8; padding: 0.7rem 0.9rem; box-shadow: 0 3px 8px rgba(60, 40, 10, 0.15); transform: rotate(-0.7deg); font-size: 0.92rem; }
+.clipping:nth-child(even) { transform: rotate(0.6deg); }
+.clipping.then { background: #f7edd6; }
+.clipping .years { display: block; font-family: var(--hand); font-size: 1.1rem; color: var(--muted); }
+.clipping strong { display: block; margin: 0.1rem 0 0.3rem; }
+.clipping p { margin: 0; }
 
 .methods { margin-top: 1.4rem; background: #fffdf7; box-shadow: var(--shadow); }
 .methods > summary { font-family: var(--hand); font-size: 1.7rem; padding: 0.7rem 1.2rem; cursor: pointer; }

@@ -5,6 +5,8 @@ import { periodMonthly } from '../metrics'
 import { fmtNum, fmtP, fmtSigned } from '../format'
 // fmtP and fmtSigned are used by TrendSentence in the chart drawer only
 import { CalendarChart, YearChart } from './YearChart'
+import { FUTURE_BIRTH_YEAR } from '../config/context'
+import { CHILDHOOD_LENGTH } from '../config/metrics'
 
 export interface PageLabels {
   then: { born: string; years: string }
@@ -57,13 +59,33 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
     if (!t.significant) trendWords = 'Up some years, down others, since 1981.'
     else trendWords = t.direction === 'up' ? 'Going up steadily since 1981.' : 'Going down steadily since 1981.'
   }
+  const future = projectFuture(r)
   return (
     <div className={`note ${worse ? 'worse' : 'better'}`}>
       <p className="line">{line}</p>
       <Verdict r={r} />
       {trendWords && <p className="trendwords">{trendWords}</p>}
+      {future !== null && (
+        <p className="future">
+          Born {FUTURE_BIRTH_YEAR}, if it keeps going: about <strong>{Math.round(future)}</strong> {mm ? 'mm' : 'a year'}.
+        </p>
+      )}
     </div>
   )
+}
+
+/**
+ * Straight-line extension of Sen's slope to the childhood of a kid born in FUTURE_BIRTH_YEAR.
+ * Only for metrics with a real (significant) trend; clamped to what a year can hold. Not a forecast.
+ */
+export function projectFuture(r: MetricResult): number | null {
+  const t = r.trend
+  if (!t || !t.significant) return null
+  const midYear = FUTURE_BIRTH_YEAR + (CHILDHOOD_LENGTH - 1) / 2
+  let v = t.intercept + t.slope * midYear
+  if (r.def.unit === 'days') v = Math.max(0, Math.min(366, v))
+  else v = Math.max(0, v)
+  return v
 }
 
 export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; labels: PageLabels }) {
