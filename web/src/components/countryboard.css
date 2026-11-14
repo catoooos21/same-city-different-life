@@ -1,0 +1,57 @@
+/* Country board: weather (data) next to action (context). Uses the tokens from styles.css. */
+.board { margin-top: 2.6rem; }
+.board h2 { font-family: var(--hand); font-size: clamp(1.9rem, 4.5vw, 2.6rem); }
+.board h3 { font-family: var(--hand); font-size: 1.7rem; margin-top: 1.6rem; }
+.board h3 small { font-family: var(--body); font-size: 0.85rem; font-weight: 600; color: var(--muted); margin-left: 0.4rem; }
+.board-lead { margin: 0.3rem 0 0; font-size: 1.05rem; }
+.board-note { background: var(--note); background-image: linear-gradient(160deg, var(--note) 0%, var(--note-2) 100%); padding: 0.8rem 1rem; margin-top: 1rem; box-shadow: 0 4px 10px rgba(60, 40, 10, 0.2); transform: rotate(-0.3deg); }
+.board-note p { margin: 0; }
+.board-note p + p { margin-top: 0.4rem; font-size: 0.95rem; }
+
+.ccards { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 1rem; margin-top: 0.7rem; }
+.ccard { background: var(--paper-now); box-shadow: var(--shadow); padding: 0.9rem 1rem 1rem; border-top: 5px solid #c9b995; min-width: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.stage.long .ccard { border-top-color: var(--better); }
+.stage.recent .ccard { border-top-color: #d9a441; }
+.stage.none .ccard { border-top-color: var(--grey); }
+.ccard header h4 { font-size: 1.2rem; }
+.ccard header small { color: var(--muted); }
+.ccard .side { border-top: 1px dashed #c9b995; padding-top: 0.5rem; }
+.ccard .side p { margin: 0.35rem 0 0; font-size: 0.92rem; }
+.ccard .sidelabel { margin: 0 0 0.3rem; font-family: var(--hand); font-size: 1.15rem; color: var(--muted); }
+.ccard .datanote { background: #fff3d6; border-left: 4px solid #d9a441; padding: 0.35rem 0.6rem; }
+.ccard .worse strong { color: var(--worse); }
+.ccard .better strong { color: var(--better); }
+.ccard ul { margin: 0.35rem 0 0; padding-left: 1.1rem; font-size: 0.92rem; }
+.ccard li { margin-bottom: 0.2rem; }
+.ccard .csources { font-size: 0.78rem; color: var(--muted); }
+.ccard .btn { align-self: flex-start; margin-top: auto; }
+
+.wstamp, .astamp { display: inline-block; font-weight: 800; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.15rem 0.5rem; border: 2px solid currentColor; border-radius: 4px; white-space: nowrap; }
+.wstamp.fast { color: var(--worse); }
+.wstamp.heating { color: #b5651d; }
+.wstamp.none, .wstamp.unknown { color: var(--grey); border-style: dashed; }
+.wstamp.cooling { color: var(--ink-now); }
+.astamp { border-radius: 999px; }
+.astamp.long { color: var(--better); }
+.astamp.recent { color: #8a6410; }
+.astamp.none { color: var(--muted); }
+.astamp.unknown { color: var(--grey); border-style: dashed; font-weight: 600; }
+
+.allcountries { background: var(--paper-then); box-shadow: var(--shadow); padding: 0.4rem 1.2rem 1.2rem; margin-top: 1.6rem; }
+.allcountries h3 { margin-top: 0.6rem; }
+.board-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 0.2rem; margin-top: 0.4rem; }
+.board-filters input[type='search'] { width: auto; flex: 1 1 180px; font-size: 1rem; margin-left: 0.3rem; }
+.crows { list-style: none; margin: 0.7rem 0 0; padding: 0; max-height: 460px; overflow-y: auto; border: 1px solid #d9cba8; background: #fffdf7; }
+.crows li + li { border-top: 1px solid #eadfc4; }
+.crow { display: grid; grid-template-columns: minmax(0, 1.4fr) auto minmax(0, 0.8fr) minmax(0, 0.9fr) auto; gap: 0.3rem 0.9rem; align-items: center; width: 100%; text-align: left; background: none; border: none; padding: 0.45rem 0.8rem; color: var(--ink); }
+.crow:hover { background: var(--note); }
+.crow .cname small { display: block; color: var(--muted); font-size: 0.8rem; }
+.crow .cnum, .crow .clife { font-size: 0.88rem; }
+.crow .astamp { justify-self: end; }
+
+@media (max-width: 720px) {
+  .crow { grid-template-columns: minmax(0, 1fr) auto; }
+  .crow .cnum { grid-column: 1; }
+  .crow .clife { grid-column: 2; justify-self: end; }
+  .crow .astamp { grid-column: 1 / -1; justify-self: start; }
+}

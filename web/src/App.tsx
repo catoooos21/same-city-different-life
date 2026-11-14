@@ -5,6 +5,7 @@ import { analyse, type CityAnalysis } from './metrics'
 import { DEMO_CITIES, loadDaily, type DailySeries, type LoadStatus } from './power'
 import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from './state'
 import { CaseFile } from './components/CaseFile'
+import { CountryBoard } from './components/CountryBoard'
 import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
 import { Scrapbook, periodLabel, type PageLabels } from './components/Scrapbook'
@@ -138,6 +139,7 @@ function Home({ q, set }: { q: Query; set: (p: Partial<Query>) => void }) {
         ))}
       </p>
       <p className="muted small">Any city on Earth works. The weather comes straight from NASA.</p>
+      <CountryBoard onPick={go} />
     </section>
   )
 }
