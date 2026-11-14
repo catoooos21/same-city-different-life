@@ -16,7 +16,6 @@ export interface LensMetric {
 export interface Lens {
   id: string
   label: string
-  emoji: string
   /** Who the two cards are: "A kid born in", "An outdoor worker in" ... */
   subject: string
   intro: string
@@ -31,7 +30,6 @@ export const LENSES: Lens[] = [
   {
     id: 'kid',
     label: 'Kid / parent',
-    emoji: '🧒',
     subject: 'A kid born in',
     intro: 'Same city. Same age. A different childhood.',
     metrics: [
@@ -46,7 +44,6 @@ export const LENSES: Lens[] = [
   {
     id: 'worker',
     label: 'Outdoor worker',
-    emoji: '👷',
     subject: 'An outdoor worker starting in',
     intro: 'Same job. Same city. Different working days.',
     metrics: [
@@ -60,7 +57,6 @@ export const LENSES: Lens[] = [
   {
     id: 'farmer',
     label: 'Farmer / gardener',
-    emoji: '🌱',
     subject: 'A farmer starting out in',
     intro: 'Same fields. Different rain.',
     metrics: [
@@ -74,7 +70,6 @@ export const LENSES: Lens[] = [
   {
     id: 'runner',
     label: 'Runner / athlete',
-    emoji: '🏃',
     subject: 'A runner who started in',
     intro: 'Same route. Different training calendar.',
     metrics: [
@@ -87,7 +82,6 @@ export const LENSES: Lens[] = [
   {
     id: 'older',
     label: 'Older person',
-    emoji: '🧓',
     subject: 'An older person living here from',
     intro: 'Same home. Different summers.',
     metrics: [
@@ -100,7 +94,6 @@ export const LENSES: Lens[] = [
   {
     id: 'traveller',
     label: 'Traveller / event planner',
-    emoji: '🧳',
     subject: 'A visitor planning for',
     intro: 'Same destination. Different best months.',
     metrics: [
@@ -155,7 +148,6 @@ function customMetrics(pick: string[]): LensMetric[] {
 const CUSTOM_LENS: Lens = {
   id: CUSTOM_LENS_ID,
   label: 'Choose your own',
-  emoji: '🔎',
   subject: 'Someone living here from',
   intro: 'You chose the measures. Same city, different years.',
   metrics: customMetrics(DEFAULT_PICK),

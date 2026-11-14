@@ -66,8 +66,17 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .btn.primary { background: var(--accent); color: #fff; border-color: #7a2619; box-shadow: 2px 2px 0 #7a2619; }
 .btn.small { padding: 0.3rem 0.8rem; font-size: 0.9rem; }
 .linkish { background: none; border: none; color: var(--ink-now); text-decoration: underline; padding: 0.2rem 0; font-size: 0.9rem; }
-.chip { border: 2px solid #c9b995; background: #fffdf7; border-radius: 999px; padding: 0.3rem 0.8rem; margin: 0.15rem; font-weight: 600; }
-.chip.on { background: var(--ink); color: #fff; border-color: var(--ink); }
+.chip { border: 2px solid #c9b995; background: #fffdf7; color: var(--ink); border-radius: 999px; padding: 0.35rem 0.95rem; margin: 0.15rem; font-weight: 600; transition: background 0.12s, border-color 0.12s, transform 0.12s; }
+.chip:hover { border-color: var(--ink-then); background: var(--note); }
+.chip:active { transform: translateY(1px); }
+.chip.on, .chip.on:hover { background: var(--ink); color: #fff; border-color: var(--ink); }
+.btn { transition: transform 0.1s, box-shadow 0.1s; }
+.btn:not(:disabled):hover { transform: translate(-1px, -1px); box-shadow: 3px 3px 0 var(--ink); }
+.btn.primary:not(:disabled):hover { box-shadow: 3px 3px 0 #7a2619; }
+.btn:not(:disabled):active { transform: translate(1px, 1px); box-shadow: 1px 1px 0 var(--ink); }
+/* keyboard users can always see where they are */
+:is(button, a, select, input, summary, [role='link']):focus-visible { outline: 3px solid var(--ink-now); outline-offset: 2px; }
+select:hover, input[type='search']:hover, input[type='number']:hover { border-color: var(--ink-then); }
 .lenses, .modes { display: flex; flex-wrap: wrap; }
 .demos { margin-top: 1.4rem; }
 
@@ -321,6 +330,16 @@ li.main { list-style: none; margin-left: -1.1rem; margin-bottom: 0.6rem; padding
 .share { margin-top: 1.4rem; text-align: center; }
 
 footer { margin-top: 2.5rem; text-align: center; color: var(--muted); font-size: 0.85rem; }
+
+/* Side by side: the then and now numbers sit level with the middle of the note between them, and a
+   faint rule separates one measure from the next, so the pages read as rows and have no dead space. */
+@media (min-width: 721px) {
+  .row .cell.then, .row .cell.now { display: flex; flex-direction: column; }
+  .row .tile { margin-top: auto; margin-bottom: auto; padding: 0.9rem 1.1rem 0.8rem; }
+  .row .tile .big { font-size: 3.6rem; }
+  .row .tile .unit { font-size: 0.95rem; }
+  .row:not(.last) .cell.then, .row:not(.last) .cell.now { border-bottom: 1px dashed rgba(60, 40, 10, 0.18); }
+}
 
 @media (max-width: 720px) {
   .pages { grid-template-columns: 1fr 1fr; grid-auto-flow: dense; gap: 0 0.7rem; }

@@ -1,0 +1,6 @@
+/* The ground under the city. Reuses the case-file rows from styles.css; only the differences live here. */
+.casefile.land { background: #f1f4e8; }
+.casefile.land .caselist li { background: #fbfcf6; border-color: #c9d2ad; }
+.landsum { font-size: 1.05rem; margin-top: 0.9rem !important; }
+.casefile.land .fadenote { margin-top: 0.8rem !important; }
+.landdef { margin: 0.4rem 0 0; }

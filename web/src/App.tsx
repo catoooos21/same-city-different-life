@@ -9,6 +9,7 @@ import { CaseFile } from './components/CaseFile'
 import { Compare } from './components/Compare'
 import { SecondOpinion } from './components/SecondOpinion'
 import { CountryStanding } from './components/CountryStanding'
+import { Land } from './components/Land'
 import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
 import { Scrapbook, periodLabel, type PageLabels } from './components/Scrapbook'
@@ -152,7 +153,7 @@ function LensPicker({ value, onChange }: { value: string; onChange: (id: string)
     <div className="lenses" role="radiogroup">
       {LENSES.map((l) => (
         <button key={l.id} type="button" role="radio" aria-checked={value === l.id} className={`chip ${value === l.id ? 'on' : ''}`} onClick={() => onChange(l.id)}>
-          <span aria-hidden="true">{l.emoji}</span> {l.label}
+          {l.label}
         </button>
       ))}
     </div>
@@ -294,6 +295,9 @@ function Result(props: {
           </Fold>
           <Fold title="A second opinion on rain" teaser="NASA's rain satellites against the weather model, 1998–2025." lazy>
             <SecondOpinion city={city} a={analysis} />
+          </Fold>
+          <Fold title="The ground under the city" teaser="Not only the air: ground heat, soil wetness and evaporation." lazy>
+            <Land city={city} a={analysis} />
           </Fold>
           <Fold title="Why might this be?" teaser="The main reason, and what these numbers cannot see.">
             <WhyPanel country={city.country} cityName={city.name} then={then} now={now} />
