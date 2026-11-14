@@ -259,7 +259,7 @@ function Result(props: {
       )}
       {analysis && daily && (
         <>
-          <CountryStanding a={analysis} city={city} />
+          <CountryStanding city={city} />
           <Scrapbook a={analysis} lens={lens} labels={labels} />
           <GlobalContext a={analysis} cityName={city.name} />
           <p className="foldbar">

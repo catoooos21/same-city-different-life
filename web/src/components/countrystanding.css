@@ -1,30 +1,40 @@
-/* Where this place stands: weather stamp (data) next to action stamp (context). Tokens from styles.css. */
-.standing { background: var(--paper-now); box-shadow: var(--shadow); padding: 0.8rem 1.1rem; margin: 0 0 1.4rem; border-top: 5px solid #c9b995; }
-.standing-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 0.8rem 1.6rem; }
-.standing-side p { margin: 0.35rem 0 0; font-size: 0.95rem; }
-.standing .sidelabel { margin: 0 0 0.35rem; font-family: var(--hand); font-size: 1.3rem; line-height: 1.15; color: var(--ink-then); }
-.standing .sidelabel small { font-family: var(--body); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em; text-transform: uppercase; color: var(--muted); margin-left: 0.3rem; }
+/* Where the country stands: one stamp, what it is doing, why. Tokens from styles.css. */
+.standing { background: var(--paper-now); box-shadow: var(--shadow); padding: 0.9rem 1.2rem 0.8rem; margin: 0 0 1.4rem; border-top: 6px solid var(--grey); }
+.standing.improving { border-top-color: var(--better); }
+.standing.starting { border-top-color: #d9a441; }
+.standing.worse { border-top-color: var(--worse); }
 
-.wstamp, .astamp { display: inline-block; font-weight: 800; font-size: 0.78rem; letter-spacing: 0.06em; text-transform: uppercase; padding: 0.2rem 0.6rem; border: 2px solid currentColor; border-radius: 4px; }
-.wstamp.fast { color: var(--worse); }
-.wstamp.heating { color: #b5651d; }
-.wstamp.none, .wstamp.unknown { color: var(--grey); border-style: dashed; }
-.wstamp.cooling { color: var(--ink-now); }
-.astamp { border-radius: 999px; }
-.astamp.long { color: var(--better); }
-.astamp.recent { color: #8a6410; }
-.astamp.none { color: var(--muted); }
-.astamp.unknown { color: var(--grey); border-style: dashed; font-weight: 600; }
+.standing-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(160px, 240px); gap: 0.6rem 1.6rem; align-items: center; }
+.standing .sidelabel { margin: 0 0 0.4rem; font-family: var(--hand); font-size: 1.5rem; line-height: 1.1; color: var(--ink-then); }
+.sstamp { display: inline-block; font-weight: 800; font-size: 1rem; letter-spacing: 0.08em; text-transform: uppercase; padding: 0.25rem 0.8rem; border: 3px solid currentColor; border-radius: 5px; transform: rotate(-2deg); }
+.sstamp.improving { color: var(--better); }
+.sstamp.starting { color: #8a6410; }
+.sstamp.worse { color: var(--worse); }
+.standing-line { margin: 0.6rem 0 0; font-size: 1.05rem; }
 
-.standing-more { margin-top: 0.7rem; border-top: 1px dashed #c9b995; padding-top: 0.5rem; }
-.standing-more > summary { cursor: pointer; font-weight: 800; color: var(--muted); font-size: 0.92rem; }
-.standing-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr)); gap: 0.4rem 1.6rem; margin-top: 0.5rem; font-size: 0.92rem; }
-.standing-cols h4 { font-family: var(--hand); font-size: 1.25rem; }
-.standing-cols p { margin: 0.35rem 0 0; }
-.standing-cols ul { margin: 0.35rem 0 0; padding-left: 1.1rem; }
-.standing-cols li { margin-bottom: 0.2rem; }
-.standing .worse strong { color: var(--worse); }
-.standing .better strong { color: var(--better); }
-.standing .datanote { background: #fff3d6; border-left: 4px solid #d9a441; padding: 0.35rem 0.6rem; }
+.standing figure { margin: 0; }
+.co2spark { display: block; width: 100%; height: 46px; }
+.co2spark .base { stroke: rgba(0, 0, 0, 0.15); stroke-width: 1; }
+.co2spark .all { fill: none; stroke: var(--grey); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.co2spark .recent { fill: none; stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; vector-effect: non-scaling-stroke; stroke: var(--ink); }
+.standing.improving .co2spark .recent { stroke: var(--better); }
+.standing.starting .co2spark .recent { stroke: #b8860b; }
+.standing.worse .co2spark .recent { stroke: var(--worse); }
+.standing figcaption { font-size: 0.75rem; color: var(--muted); margin-top: 0.2rem; line-height: 1.3; }
+
+.standing-lists { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 0.4rem 1.8rem; margin-top: 0.8rem; border-top: 1px dashed #c9b995; padding-top: 0.6rem; }
+.standing-lists h4 { font-family: var(--hand); font-size: 1.3rem; }
+.standing-lists ul { margin: 0.3rem 0 0; padding-left: 1.1rem; font-size: 0.95rem; }
+.standing-lists li { margin-bottom: 0.25rem; }
+.standing-plain { margin: 0.6rem 0 0; font-size: 0.92rem; color: var(--muted); }
+
+.standing-more { margin-top: 0.7rem; border-top: 1px dashed #c9b995; padding-top: 0.45rem; font-size: 0.9rem; }
+.standing-more > summary { cursor: pointer; font-weight: 800; color: var(--muted); }
+.standing-more p { margin: 0.45rem 0 0; }
+.standing-more ul { margin: 0.4rem 0 0; padding-left: 1.1rem; }
+.standing-more li { margin-bottom: 0.2rem; }
 .standing .csources { font-size: 0.8rem; color: var(--muted); }
-.standing-note { background: var(--note); background-image: linear-gradient(160deg, var(--note) 0%, var(--note-2) 100%); padding: 0.6rem 0.9rem; margin: 0.8rem 0 0.2rem; font-size: 0.92rem; }
+
+@media (max-width: 720px) {
+  .standing-head { grid-template-columns: 1fr; }
+}

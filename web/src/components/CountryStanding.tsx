@@ -1,141 +1,157 @@
-import { useEffect, useMemo, useState } from 'react'
-import { ACTIONS, STAGE_LABEL, STAGE_RULE } from '../config/actions'
-import { METRIC_BY_ID, YEARS } from '../config/metrics'
-import { MORE_IS_BETTER, MORE_IS_WORSE, WEATHER_LABEL, WORLD_PER_DECADE, countWeather, summarise, weatherOf, type CountryRow, type CountrySummary } from '../countries'
-import type { CityAnalysis } from '../metrics'
+import { useEffect, useState } from 'react'
+import { ACTIONS, GENERIC_DOING, GENERIC_WHY } from '../config/actions'
+import { LEVEL_BAND_PCT, STANDING_LABEL, WINDOW_YEARS, countryVerdict, verdictSentence, type EmissionsFile } from '../emissions'
 import type { City } from '../state'
-import { fmtSigned } from '../format'
 import './countrystanding.css'
 
-/** Names of the everyday-life metrics that are really getting better / worse at this city. */
-function lifeNames(s: CountrySummary): { worse: string[]; better: string[] } {
-  const worse: string[] = []
-  const better: string[] = []
-  for (const m of s.metrics) {
-    if (m.call === 'none') continue
-    const up = m.call === 'up'
-    const name = METRIC_BY_ID[m.id]?.name.toLowerCase() ?? m.id
-    const label = `${up ? 'more' : 'fewer'} ${name}`
-    if (MORE_IS_WORSE.includes(m.id)) (up ? worse : better).push(label)
-    else if (MORE_IS_BETTER.includes(m.id)) (up ? better : worse).push(label)
+const CHART_FROM = 2000
+
+let cache: Promise<EmissionsFile> | null = null
+function loadEmissions(): Promise<EmissionsFile> {
+  if (!cache) {
+    cache = fetch(`${import.meta.env.BASE_URL}emissions.json`).then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
+    cache.catch(() => (cache = null))
   }
-  return { worse, better }
+  return cache
 }
 
-/** One line of scale from the prebuilt capitals file; quietly absent if the file cannot be read. */
-function useWorldLine(open: boolean): string | null {
-  const [line, setLine] = useState<string | null>(null)
+/** The country's CO2 since 1990 as a small line, with the ten judged years drawn heavier. */
+function Co2Spark({ years, values, from }: { years: number[]; values: (number | null)[]; from: number }) {
+  const W = 220
+  const H = 46
+  const pad = 4
+  const finite = values.filter((v): v is number => v !== null)
+  if (finite.length < 2) return null
+  const hi = Math.max(...finite) * 1.05
+  const x = (y: number) => pad + ((y - years[0]) / (years[years.length - 1] - years[0])) * (W - 2 * pad)
+  const yv = (v: number) => pad + (1 - v / hi) * (H - 2 * pad)
+  const pts = (keep: (y: number) => boolean) =>
+    years
+      .map((yr, i) => (values[i] === null || !keep(yr) ? null : `${x(yr).toFixed(1)},${yv(values[i] as number).toFixed(1)}`))
+      .filter(Boolean)
+      .join(' ')
+  return (
+    <svg className="co2spark" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`CO2 emissions, ${years[0]} to ${years[years.length - 1]}`} preserveAspectRatio="none">
+      <line x1={pad} x2={W - pad} y1={H - pad} y2={H - pad} className="base" />
+      <polyline points={pts(() => true)} className="all" />
+      <polyline points={pts((y) => y >= from)} className="recent" />
+    </svg>
+  )
+}
+
+/**
+ * Shown after a city search: is this country improving, starting, or getting worse, and why.
+ * Judged on the country's own CO2 pollution, not on the weather shown on the rest of the page.
+ */
+export function CountryStanding({ city }: { city: City }) {
+  const [file, setFile] = useState<EmissionsFile | null>(null)
   useEffect(() => {
-    if (!open || line) return
     let alive = true
-    fetch(`${import.meta.env.BASE_URL}countries.json`)
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(String(r.status)))))
-      .then((j: { countries: CountryRow[] }) => {
-        if (!alive) return
-        const c = countWeather(j.countries)
-        setLine(
-          `For scale, we ran the same test on the capital of ${j.countries.length} countries: ${c.fast} are heating faster than the world, ${c.heating} are heating, ${c.none} show no clear change and ${c.cooling} ${c.cooling === 1 ? 'is' : 'are'} cooling.`,
-        )
-      })
+    loadEmissions()
+      .then((f) => alive && setFile(f))
       .catch(() => {})
     return () => {
       alive = false
     }
-  }, [open, line])
-  return line
-}
+  }, [])
 
-/**
- * Shown after a city search: where this place stands. Two stamps that are never mixed:
- * the weather at the searched city (NASA data) and what its country is doing (team context).
- */
-export function CountryStanding({ a, city }: { a: CityAnalysis; city: City }) {
-  const s = useMemo(() => summarise(a), [a])
-  const w = weatherOf(s)
-  const life = lifeNames(s)
-  const action = city.country ? ACTIONS[city.country] : undefined
-  const [open, setOpen] = useState(false)
-  const worldLine = useWorldLine(open)
+  if (!city.country || !file) return null
+  const action = ACTIONS[city.country]
+  const v = countryVerdict(file, city.country, action?.stage)
+  if (!v) return null
+
+  // The chart starts in 2000: Kuwait's 1991 oil-fire year is several times any other and flattens the line.
+  const i0 = Math.max(0, file.years.indexOf(CHART_FROM))
+  const chartYears = file.years.slice(i0)
+  const chartValues = file.countries[city.country].slice(i0)
+
+  const notFalling = v.standing !== 'improving'
+  // A country with no net-zero target leads with what it has built; the missing target comes last.
+  const doing = action ? (action.stage === 'none' ? [...action.doing, action.target] : [action.target, ...action.doing]) : v.standing === 'improving' ? [GENERIC_DOING] : []
+  const countryName = /^United /.test(city.country) ? `the ${city.country}` : city.country
+  const why = notFalling ? (action ? action.why : v.call === 'rising' ? [GENERIC_WHY] : []) : []
+  const doingTitle = v.standing === 'improving' || action?.stage === 'none' ? (v.standing === 'worse' ? 'What it has promised' : 'What it is doing') : v.standing === 'starting' ? 'What it has started' : 'What it has promised'
+  const whyTitle = v.call === 'rising' ? 'Why its pollution is still climbing' : 'Why it is not falling yet'
 
   return (
-    <section className="standing">
-      <div className="standing-row">
-        <div className="standing-side">
-          <p className="sidelabel">
-            The weather in {city.name} <small>NASA data</small>
-          </p>
-          <span className={`wstamp ${w}`}>{WEATHER_LABEL[w]}</span>
-          {s.temp && <p>{fmtSigned(s.temp.perDecade, 2)} °C every ten years since {YEARS.first}.</p>}
+    <section className={`standing ${v.standing}`}>
+      <div className="standing-head">
+        <div>
+          <p className="sidelabel">Where {countryName} stands</p>
+          <span className={`sstamp ${v.standing}`}>{STANDING_LABEL[v.standing]}</span>
+          <p className="standing-line">{verdictSentence(v)}</p>
         </div>
-        {city.country && (
-          <div className="standing-side">
-            <p className="sidelabel">
-              {city.country}: what the country is doing <small>context</small>
-            </p>
-            <span className={`astamp ${action ? action.stage : 'unknown'}`}>{action ? STAGE_LABEL[action.stage] : 'Not looked into yet'}</span>
-            <p>{action ? action.target : 'We have not written an action note for this country yet.'}</p>
-          </div>
-        )}
+        <figure>
+          <Co2Spark years={chartYears} values={chartValues} from={v.from} />
+          <figcaption>
+            Its CO₂ each year, {chartYears[0]}–{v.to}. Darker: the {WINDOW_YEARS} years we judged.
+          </figcaption>
+        </figure>
       </div>
 
-      <details className="standing-more" onToggle={(e) => setOpen((e.target as HTMLDetailsElement).open)}>
-        <summary>What do these stamps mean?</summary>
-        <div className="standing-cols">
-          <div>
-            <h4>The weather stamp</h4>
-            <p>
-              It comes from the yearly average temperature in {city.name}, {YEARS.first} to {YEARS.last}, with the same trend test as the rest of the page. “Heating faster than the world” means at least 1.5 times the world’s{' '}
-              {fmtSigned(WORLD_PER_DECADE, 2)} °C every ten years (NASA GISTEMP).
-            </p>
-            {life.worse.length > 0 && (
-              <p className="worse">
-                <strong>Getting worse here:</strong> {life.worse.join(', ')}.
-              </p>
-            )}
-            {life.better.length > 0 && (
-              <p className="better">
-                <strong>Getting better here:</strong> {life.better.join(', ')}.
-              </p>
-            )}
-            {action?.dataNote && (w === 'cooling' || w === 'none') && <p className="datanote">{action.dataNote}</p>}
-            {worldLine && <p className="muted">{worldLine}</p>}
-          </div>
-          {city.country && (
+      {(doing.length > 0 || why.length > 0) && (
+        <div className="standing-lists">
+          {doing.length > 0 && (
             <div>
-              <h4>The action stamp</h4>
-              <p>One yardstick for every country, so it is not our opinion: when did it first set a national net-zero target?</p>
-              {action ? (
-                <>
-                  <p>
-                    <strong>{STAGE_LABEL[action.stage]}:</strong> {STAGE_RULE[action.stage]}
-                  </p>
-                  {action.steps.length > 0 && (
-                    <ul>
-                      {action.steps.map((t) => (
-                        <li key={t}>{t}</li>
-                      ))}
-                    </ul>
-                  )}
-                  <p className="csources">
-                    Sources:{' '}
-                    {action.sources.map((src, i) => (
-                      <span key={src.url}>
-                        {i > 0 && ', '}
-                        <a href={src.url} target="_blank" rel="noreferrer">
-                          {src.label}
-                        </a>
-                      </span>
-                    ))}
-                  </p>
-                </>
-              ) : (
-                <p className="muted">Action notes cover {Object.keys(ACTIONS).length} countries so far. They are written by the team from public sources.</p>
-              )}
+              <h4>{doingTitle}</h4>
+              <ul>
+                {doing.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {why.length > 0 && (
+            <div>
+              <h4>{whyTitle}</h4>
+              <ul>
+                {why.map((t) => (
+                  <li key={t}>{t}</li>
+                ))}
+              </ul>
             </div>
           )}
         </div>
-        <p className="standing-note">
-          <strong>Two different things, side by side.</strong> No country can cool its own weather with its own rules: the air is shared, and the warming follows what the whole world burns. A country that acts is cutting its share of the cause. That shows up first in its emissions and in how it protects people from heat, and in the thermometer only when the world acts together.
+      )}
+      {!action && notFalling && v.call !== 'rising' && <p className="standing-plain">We have not written up what this country is doing yet.</p>}
+
+      <details className="standing-more">
+        <summary>How we decide</summary>
+        <p>
+          We judge a country on its own CO₂ pollution from burning oil, gas and coal, because that is what its rules can change. The weather on this page follows what the whole world burns, so it cannot tell you whether one country is doing well.
+        </p>
+        <ul>
+          <li>
+            <strong>Improving:</strong> its CO₂ fell steadily over the last {WINDOW_YEARS} years ({v.from}–{v.to}), by the same trend test as the rest of the page.
+          </li>
+          <li>
+            <strong>Starting:</strong> not falling yet, but either its CO₂ has stopped climbing (no steady trend, and less than {LEVEL_BAND_PCT} % above {WINDOW_YEARS} years ago), or it set its first national net-zero target in 2020 or later.
+          </li>
+          <li>
+            <strong>Getting worse:</strong> its CO₂ is still climbing, with no recent start that we know of.
+          </li>
+        </ul>
+        <p className="csources">
+          CO₂ data:{' '}
+          <a href={file.url} target="_blank" rel="noreferrer">
+            Global Carbon Budget, via Our World in Data
+          </a>{' '}
+          (not NASA). The notes on what a country is doing are written by the team for {Object.keys(ACTIONS).length} countries so far.
+          {action && (
+            <>
+              {' '}
+              Sources for {city.country}:{' '}
+              {action.sources.map((src, i) => (
+                <span key={src.url}>
+                  {i > 0 && ', '}
+                  <a href={src.url} target="_blank" rel="noreferrer">
+                    {src.label}
+                  </a>
+                </span>
+              ))}
+              .
+            </>
+          )}
         </p>
       </details>
     </section>
