@@ -145,6 +145,11 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .yearchart .dot { fill: var(--ink); opacity: 0.85; }
 .yearchart .gap { font-size: 11px; fill: var(--grey); }
 .yearchart .bandlabel { font-family: var(--hand); font-size: 15px; fill: var(--muted); }
+.callegend { display: flex; flex-wrap: wrap; gap: 0.2rem 1.4rem; margin: 0 0 0.4rem; font-size: 0.9rem; color: var(--muted); }
+.callegend span { display: inline-flex; align-items: center; gap: 0.4rem; }
+.swatch { display: inline-block; width: 13px; height: 13px; flex: none; }
+.swatch.then { background: #b8956a; }
+.swatch.now { background: #3b6fa8; }
 .calchart .bar.then { fill: #b8956a; }
 .calchart .bar.now { fill: #3b6fa8; }
 .trendsentence { margin: 0.6rem 0 0.3rem; }

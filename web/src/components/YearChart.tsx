@@ -128,6 +128,15 @@ export function CalendarChart({ then, now, labels }: { then: (number | null)[]; 
   const bw = slot * 0.36
   const y = (v: number) => pad.t + (1 - v / max) * (H - pad.t - pad.b)
   return (
+    <>
+    <p className="callegend">
+      <span>
+        <i className="swatch then" /> Then: {labels.then}
+      </span>
+      <span>
+        <i className="swatch now" /> Now: {labels.now}
+      </span>
+    </p>
     <svg className="calchart" viewBox={`0 0 ${W} ${H}`} role="img" aria-label="Perfect outdoor days per month, then and now">
       {[0, Math.round(max / 2), Math.round(max)].map((v) => (
         <g key={v}>
@@ -151,16 +160,7 @@ export function CalendarChart({ then, now, labels }: { then: (number | null)[]; 
           </g>
         )
       })}
-      <g className="legend">
-        <rect x={W - 150} y={pad.t} width={12} height={12} className="bar then" />
-        <text x={W - 134} y={pad.t + 10} className="tick">
-          {labels.then}
-        </text>
-        <rect x={W - 80} y={pad.t} width={12} height={12} className="bar now" />
-        <text x={W - 64} y={pad.t + 10} className="tick">
-          {labels.now}
-        </text>
-      </g>
     </svg>
+    </>
   )
 }
