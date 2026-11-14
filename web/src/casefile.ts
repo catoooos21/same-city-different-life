@@ -45,7 +45,7 @@ export const CASE_GROUPS: { id: string; title: string; note: string; metrics: st
   {
     id: 'rain',
     title: 'Rain',
-    note: 'These all come from the same daily rain, the least certain part of this data.',
+    note: 'These all come from the same daily rain, the least certain part of this data. “A second opinion on rain”, further down, checks them against NASA’s rain satellites.',
     metrics: ['rainy_days', 'heavy_rain_days', 'biggest_downpour', 'longest_dry_spell'],
   },
   {

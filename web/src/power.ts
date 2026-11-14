@@ -154,6 +154,37 @@ export async function cachePut(key: string, d: DailySeries): Promise<void> {
   }
 }
 
+/** Generic best-effort read from the same store (used for the satellite rain). */
+export async function idbGet<T>(key: string): Promise<T | null> {
+  try {
+    const db = await openDb()
+    const v = await new Promise<T | undefined>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readonly')
+      const req = tx.objectStore(STORE).get(key)
+      req.onsuccess = () => resolve(req.result)
+      req.onerror = () => reject(req.error)
+    })
+    return v ?? null
+  } catch {
+    return null
+  }
+}
+
+/** Generic best-effort write to the same store. */
+export async function idbPut(key: string, value: unknown): Promise<void> {
+  try {
+    const db = await openDb()
+    await new Promise<void>((resolve, reject) => {
+      const tx = db.transaction(STORE, 'readwrite')
+      tx.objectStore(STORE).put(value, key)
+      tx.oncomplete = () => resolve()
+      tx.onerror = () => reject(tx.error)
+    })
+  } catch {
+    /* cache is best effort */
+  }
+}
+
 /** Demo cities shipped with the site, so the demo never waits on the network. */
 export interface DemoCity {
   id: string

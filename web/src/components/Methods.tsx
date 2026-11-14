@@ -130,6 +130,9 @@ export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySer
               NASA POWER Project, daily point API, MERRA-2 meteorology. <a href="https://power.larc.nasa.gov/docs/">Documentation</a>.
             </li>
             <li>
+              NASA GPM IMERG satellite precipitation, through NASA POWER (UTC days, from 1998). Used only in “A second opinion on rain”, next to MERRA-2 rain for the same days.
+            </li>
+            <li>
               NASA GISS Surface Temperature Analysis (GISTEMP v4), global annual means. <a href="https://data.giss.nasa.gov/gistemp/">data.giss.nasa.gov/gistemp</a>.
             </li>
             <li>

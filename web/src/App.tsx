@@ -6,6 +6,7 @@ import { DEMO_CITIES, loadDaily, type DailySeries, type LoadStatus } from './pow
 import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from './state'
 import { CaseFile } from './components/CaseFile'
 import { Compare } from './components/Compare'
+import { SecondOpinion } from './components/SecondOpinion'
 import { CountryStanding } from './components/CountryStanding'
 import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
@@ -288,6 +289,9 @@ function Result(props: {
           <Fold title="Same question, another city" teaser={`Put a second city next to ${city.name}.`} open={!!q.vs}>
             <Compare a={analysis} city={city} then={then} now={now} vs={q.vs} onVs={(vs) => set({ vs })} />
           </Fold>
+          <Fold title="A second opinion on rain" teaser="NASA's rain satellites against the weather model, 1998–2025." lazy>
+            <SecondOpinion city={city} a={analysis} />
+          </Fold>
           <Fold title="Why might this be?" teaser="The main reason, and what these numbers cannot see.">
             <WhyPanel country={city.country} cityName={city.name} then={then} now={now} />
           </Fold>
@@ -314,18 +318,23 @@ function Result(props: {
 }
 
 /** A section that starts closed, so the scrapbooks stay the story and the rest is one tap away. */
-function Fold({ title, teaser, open, children }: { title: string; teaser: string; open?: boolean; children: React.ReactNode }) {
+function Fold({ title, teaser, open, lazy, children }: { title: string; teaser: string; open?: boolean; lazy?: boolean; children: React.ReactNode }) {
   const [isOpen, setIsOpen] = useState(!!open)
+  // a lazy fold builds its content only once it has been opened, so nothing is fetched for a section nobody looks at
+  const [seen, setSeen] = useState(!!open)
   useEffect(() => {
     if (open) setIsOpen(true)
   }, [open])
+  useEffect(() => {
+    if (isOpen) setSeen(true)
+  }, [isOpen])
   return (
     <details className="fold" open={isOpen} onToggle={(e) => setIsOpen(e.currentTarget.open)}>
       <summary>
         <span className="foldtitle">{title}</span>
         <span className="foldteaser">{teaser}</span>
       </summary>
-      {children}
+      {lazy && !seen ? <section className="foldwait" /> : children}
     </details>
   )
 }

@@ -30,6 +30,7 @@ All work happened on 13–14 November 2026.
 | 14 Nov, morning | Added the **case file** (every metric of the city ranked by strength of evidence, with a 45-year sparkline), **sparklines** on the sticky notes, and **Two futures**: a kid born in 2030, 2040 or 2050 if the trend keeps going or slows to half pace, with how each could happen and the main reason highlighted. A what-if, not a forecast. We tried NASA POWER's climate-projection API (NEX-GDDP-CMIP6) for real model data, but it returned only missing values. |
 | 14 Nov, midday | **Honesty pass**, eight fixes. (1) The why-text now says the numbers show the region's climate (MERRA-2 squares are about 50 km wide) and that a city's own heat comes on top and is not in them. (2) Sticky notes are split into "Then vs now" and "All 45 years", and say so when the two disagree. (3) "Too hot to play / sleep" became "Unusually hot days" and "Unusually warm nights", with the plain definition on every card. (4) Rain-only metrics get a softer stamp and a caution line. (5) The case file is grouped into heat, rain and comfort, and counts groups, not lines. (6) **Same question, another city**: a second city side by side, each metric tagged same direction, opposite, or changing in only one. (7) The lower sections start folded. (8) "Half the pace" in Two futures is labelled as an example. |
 | 14 Nov, afternoon | Added **the basics** to the case file and the city comparison: average temperature, average daytime high, average night-time low (°C) and rain in the year (mm), with the same charts and trend test. The challenge names temperature and rainfall first, and until now the app only showed counts of days built from them. Units are worded in one place (`web/src/units.ts`); temperature charts do not start at zero. We also confirmed NASA POWER serves GPM IMERG satellite rain from 1998 (UTC days only), not used yet. |
+| 14 Nov, afternoon | Added **A second opinion on rain**: NASA's GPM IMERG satellite rain next to the MERRA-2 model rain, both from NASA POWER, for five rain measures over 1998–2025 with the same trend test. It reports direction and amount separately, and says so when the 45-year stamp on the page is not seen in the satellite years. In Kuwait City the two agree on direction but the satellite counts 25 rainy days a typical year and the model 10. The four demo cities have bundled copies (`scripts/fetch_demo_rain.py`). |
 
 ## 3. How it works
 
@@ -44,7 +45,7 @@ All work happened on 13–14 November 2026.
 - For each year 1981–2025 we count things people feel: hot days, hot nights, heatwave days, frost days, rainy days, heavy-rain days, the biggest downpour, the longest dry spell, sticky days, perfect outdoor days, training days. "Hot" means hot **for this city**: above the 90th percentile of 1981–2010, so Kuwait and London each get their own bar.
 - "Then" and "Now" are the average over each ten-year period. The sticky note shows the difference.
 - The stamp comes from a **Mann-Kendall trend test** (with the Hamed–Rao correction for years that are like their neighbours) on the full 45-year series, with **Sen's slope** for the size of the trend. **Real change** = p < 0.05. **No clear change** = the years jump around with no steady direction.
-- The JavaScript statistics were checked against the Python packages `pymannkendall` and `scipy` on the same series. 71 automated tests pass (`npm test` in `web/`).
+- The JavaScript statistics were checked against the Python packages `pymannkendall` and `scipy` on the same series. 80 automated tests pass (`npm test` in `web/`).
 - "Born 2040, if it keeps going" is the trend line stretched to the years 2040–2049. It is labelled as a what-if, not a forecast, and only appears where the change is real.
 
 ### The page, top to bottom
@@ -93,7 +94,7 @@ Open the address it prints (usually http://localhost:5173). Other commands, all 
 
 | Command | What it does |
 |---|---|
-| `npm test` | runs the 71 tests |
+| `npm test` | runs the 80 tests |
 | `npm run typecheck` | TypeScript check |
 | `npm run build` | production build into `web/dist/` |
 

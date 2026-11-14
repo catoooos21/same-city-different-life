@@ -246,6 +246,7 @@ export const METRICS: MetricDef[] = [
     name: 'Longest dry spell',
     plain: 'Most days in a row without rain.',
     unit: 'days',
+    unitLong: 'days in a row',
     needs: ['PRECTOTCORR'],
     definition: `Longest run of consecutive days with less than ${T.rainyDayMm} mm of precipitation within the calendar year.`,
     etccdi: 'CDD',

@@ -185,6 +185,7 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .fold > section { margin-top: 0; box-shadow: none; border-top: 1px dashed #c9b995; }
 .fold > .casefile { background: var(--paper-then); }
 .fold .futurehead h3, .fold > .casefile > h3, .fold > .compare > h3, .fold > .why > h3 { display: none; }
+.fold > .foldwait { border: none; padding: 0; }
 .fold .futurebook { border-top: 1px dashed #c9b995; }
 
 /* ---------- two cities ---------- */
@@ -208,6 +209,10 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .cside { display: flex; flex-direction: column; align-items: flex-start; gap: 0.25rem; }
 .cside .spark { margin-top: 0; height: 30px; }
 .cside .howmuch { font-size: 0.88rem; }
+.cside .typical { font-size: 0.88rem; }
+.opinion .error { margin-top: 0.8rem; }
+.fadenote { margin: 0.6rem 0 0 !important; padding: 0.5rem 0.8rem; background: #fff3d6; border-left: 4px solid #d9a441; font-size: 0.95rem; }
+.matchtag.missing { background: #e6dfcf; color: var(--muted); }
 .copen { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr)); gap: 1rem; background: #fffdf7; }
 .copen h5 { font-family: var(--hand); font-size: 1.3rem; margin: 0; }
 .copen .trendsentence { font-size: 0.9rem; }

@@ -55,6 +55,12 @@ when more than 10 % of its days are missing; leap days count like any other day.
 
 **NASA GISTEMP v4** global annual mean (land-ocean) gives the “vs the world” line under the scrapbooks.
 
+**NASA GPM IMERG** satellite rain, also through NASA POWER (`IMERG_PRECTOT`), gives “A second opinion on rain”:
+the five rain measures from the satellites next to the same measures from MERRA-2, for the same point, the same
+years (1998–2025) and the same trend test. Checked on 2026-11-14: the parameter is only served with
+`time-standard=utc`, it starts on 1998-01-01, and CORS is open ([web/src/rain.ts](web/src/rain.ts) records this).
+MERRA-2 rain is requested again in UTC for this section, so both sources count the same days.
+
 **City search**: GeoNames cities with population > 100,000 (6,266 cities; name, country, lat, lon), CC BY 4.0.
 
 ## Metrics (all thresholds live in one file)
@@ -124,7 +130,7 @@ and the real Kuwait hot-days series). The Python reference lives in [pipeline/st
 regenerate the fixtures with `python -m pipeline.tests.make_js_fixtures`.
 
 ```bash
-cd web && npm test            # 71 tests: statistics vs Python, calendar, metrics engine, missing-day rule, the basics, case file, two cities, two futures
+cd web && npm test            # 80 tests: statistics vs Python, calendar, metrics engine, missing-day rule, the basics, case file, two cities, two futures, satellite rain
 python -m pytest pipeline/tests   # Python reference tests
 ```
 

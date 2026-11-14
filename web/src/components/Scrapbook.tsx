@@ -222,6 +222,7 @@ export function TrendSentence({ r }: { r: MetricResult }) {
       <small className="muted">
         Trend test: {fmtP(t.p)}, {t.n} years. The dots are each year; the line is the long-term trend.
       </small>
+      {t.significant && lo <= 0 && hi >= 0 && <span className="raincaution">The range reaches zero, so this is a borderline case: the test for a steady direction passed, but the size of the change is not pinned down.</span>}
       {t.significant && r.def.lessCertain && <span className="raincaution">{RAIN_CAUTION}</span>}
     </p>
   )
