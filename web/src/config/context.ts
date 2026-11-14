@@ -131,5 +131,30 @@ export const PACE_LINE =
   'Even a small change is a fast one. The world is now warming about 10 times faster than it did when it came out of the last ice age.'
 export const PACE_SOURCE = { label: 'NASA: Climate change evidence', url: 'https://science.nasa.gov/climate-change/evidence/' }
 
+/**
+ * "Two futures": what would keep the trend going, and what could slow it. Plain-word context from
+ * research, written by the team; the data in this app cannot prove any of it. Edit freely.
+ */
+export const KEEPS_GOING: string[] = [
+  'The world keeps burning oil, gas and coal the way it does today, so the whole planet keeps warming.',
+  'The city keeps spreading: more asphalt, concrete and glass, fewer trees and less open ground.',
+  'More cars and more air conditioners every year, each one pushing its heat out into the street.',
+  'Buildings that soak up the sun, so they need more cooling, which heats the street even more.',
+]
+export const SLOWS_DOWN: string[] = [
+  'The world burns less oil, gas and coal and makes more of its electricity from the sun and the wind. This is the big one, and no city can do it alone.',
+  'Trees and shade: parks, street trees and green roofs cool the streets around them.',
+  'Light-coloured roofs and pavements that bounce sunlight back instead of storing it.',
+  'Fewer car trips: metro, buses, and shaded streets people can walk.',
+  'Better-insulated buildings and efficient cooling, so less heat is pumped outdoors.',
+]
+export const FUTURE_NOTE =
+  'Cutting pollution worldwide slows the warming itself. Trees, shade and lighter surfaces cool a city’s own streets, mostly its hot nights. Rain is different: no city can steer it.'
+export const FUTURE_SOURCES = [
+  { label: 'NASA: causes of climate change', url: 'https://science.nasa.gov/climate-change/causes/' },
+  { label: 'NASA: mitigation and adaptation', url: 'https://science.nasa.gov/climate-change/adaptation-mitigation/' },
+  { label: 'US EPA: heat island reduction solutions', url: 'https://www.epa.gov/heatislands/what-you-can-do-reduce-heat-islands' },
+]
+
 /** "If it keeps going" projection: birth year of the future kid. A straight-line extension of the trend, not a forecast. */
 export const FUTURE_BIRTH_YEAR = 2040

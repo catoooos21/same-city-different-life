@@ -4,6 +4,8 @@ import { LENSES, LENS_BY_ID, type Lens } from './config/lenses'
 import { analyse, type CityAnalysis } from './metrics'
 import { DEMO_CITIES, loadDaily, type DailySeries, type LoadStatus } from './power'
 import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from './state'
+import { CaseFile } from './components/CaseFile'
+import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
 import { Scrapbook, periodLabel, type PageLabels } from './components/Scrapbook'
 import { GlobalContext, Methods } from './components/Methods'
@@ -256,6 +258,8 @@ function Result(props: {
       {analysis && daily && (
         <>
           <Scrapbook a={analysis} lens={lens} labels={labels} />
+          <FutureBook a={analysis} lens={lens} />
+          <CaseFile a={analysis} cityName={city.name} />
           <GlobalContext a={analysis} cityName={city.name} />
           <WhyPanel country={city.country} cityName={city.name} then={then} now={now} />
           <Methods a={analysis} d={daily} lens={lens} cityName={city.name} />

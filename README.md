@@ -120,7 +120,7 @@ and the real Kuwait hot-days series). The Python reference lives in [pipeline/st
 regenerate the fixtures with `python -m pipeline.tests.make_js_fixtures`.
 
 ```bash
-cd web && npm test            # 46 tests: statistics vs Python, calendar, metrics engine, missing-day rule
+cd web && npm test            # 53 tests: statistics vs Python, calendar, metrics engine, missing-day rule, case file, two futures
 python -m pytest pipeline/tests   # Python reference tests
 ```
 

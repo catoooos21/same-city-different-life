@@ -2,7 +2,7 @@ import type { MetricResult, Period } from '../metrics'
 import { YEARS } from '../config/metrics'
 
 /** Every year since 1981 as hand-drawn-looking dots, with Sen's slope line and the two periods shaded. */
-export function YearChart({ r, then, now, height = 180 }: { r: MetricResult; then: Period; now: Period; height?: number }) {
+export function YearChart({ r, then, now, height = 180, showTrend = true }: { r: MetricResult; then: Period; now: Period; height?: number; showTrend?: boolean }) {
   const W = 640
   const H = height
   const pad = { l: 40, r: 12, t: 14, b: 26 }
@@ -12,7 +12,7 @@ export function YearChart({ r, then, now, height = 180 }: { r: MetricResult; the
   if (!finite.length) return <p className="muted">No complete years for this metric.</p>
   let lo = Math.min(...finite)
   let hi = Math.max(...finite)
-  if (r.trend) {
+  if (r.trend && showTrend) {
     const t = r.trend
     lo = Math.min(lo, t.intercept + t.slope * YEARS.first, t.intercept + t.slope * YEARS.last)
     hi = Math.max(hi, t.intercept + t.slope * YEARS.first, t.intercept + t.slope * YEARS.last)
@@ -28,7 +28,7 @@ export function YearChart({ r, then, now, height = 180 }: { r: MetricResult; the
   const b1 = bandX(then)
   const b2 = bandX(now)
   const ticks = niceTicks(lo, hi, 4)
-  const t = r.trend
+  const t = showTrend ? r.trend : null
   const unit = r.def.unit === 'mm' ? 'mm' : 'days'
   const title = `${r.def.name}, ${YEARS.first}–${YEARS.last}`
 
@@ -71,6 +71,37 @@ export function YearChart({ r, then, now, height = 180 }: { r: MetricResult; the
       <text x={b2.x0 + 4} y={pad.t + 12} className="bandlabel">
         now
       </text>
+    </svg>
+  )
+}
+
+/** Tiny 45-year line for a sticky note or a case-file row: the evidence at a glance. */
+export function Sparkline({ r, showTrend = true }: { r: MetricResult; showTrend?: boolean }) {
+  const W = 160
+  const H = 36
+  const pad = 3
+  const years = r.annual.years
+  const vals = r.annual.values
+  const finite = vals.filter((v): v is number => v !== null)
+  if (finite.length < 2) return null
+  const t = showTrend ? r.trend : null
+  let lo = Math.min(...finite)
+  let hi = Math.max(...finite)
+  if (t) {
+    lo = Math.min(lo, t.intercept + t.slope * YEARS.first, t.intercept + t.slope * YEARS.last)
+    hi = Math.max(hi, t.intercept + t.slope * YEARS.first, t.intercept + t.slope * YEARS.last)
+  }
+  if (hi === lo) hi = lo + 1
+  const x = (y: number) => pad + ((y - YEARS.first) / (YEARS.last - YEARS.first)) * (W - 2 * pad)
+  const yv = (v: number) => pad + (1 - (v - lo) / (hi - lo)) * (H - 2 * pad)
+  const points = years
+    .map((yr, i) => (vals[i] === null ? null : `${x(yr).toFixed(1)},${yv(vals[i] as number).toFixed(1)}`))
+    .filter(Boolean)
+    .join(' ')
+  return (
+    <svg className="spark" viewBox={`0 0 ${W} ${H}`} role="img" aria-label={`${r.def.name}, every year ${YEARS.first}–${YEARS.last}`} preserveAspectRatio="none">
+      <polyline points={points} className="sparkline" />
+      {t && <line x1={x(YEARS.first)} x2={x(YEARS.last)} y1={yv(t.intercept + t.slope * YEARS.first)} y2={yv(t.intercept + t.slope * YEARS.last)} className={`sparktrend ${t.significant ? 'sig' : 'nsig'}`} />}
     </svg>
   )
 }

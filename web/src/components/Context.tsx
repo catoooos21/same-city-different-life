@@ -17,8 +17,11 @@ export function WhyPanel({ country, cityName, then, now }: { country: string; ci
 
       <h4>The usual reasons, everywhere</h4>
       <ul className="simple">
-        {GLOBAL_REASONS.map((r) => (
-          <li key={r}>{r}</li>
+        {GLOBAL_REASONS.map((r, i) => (
+          <li key={r} className={i === 0 ? 'main' : ''}>
+            {i === 0 && <span className="maintag">Main reason</span>}
+            {r}
+          </li>
         ))}
       </ul>
 

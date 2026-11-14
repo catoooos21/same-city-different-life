@@ -4,7 +4,7 @@ import type { CityAnalysis, MetricResult, Period } from '../metrics'
 import { periodMonthly } from '../metrics'
 import { fmtNum, fmtP, fmtSigned } from '../format'
 // fmtP and fmtSigned are used by TrendSentence in the chart drawer only
-import { CalendarChart, YearChart } from './YearChart'
+import { CalendarChart, Sparkline, YearChart } from './YearChart'
 import { FUTURE_BIRTH_YEAR } from '../config/context'
 import { CHILDHOOD_LENGTH } from '../config/metrics'
 
@@ -13,7 +13,7 @@ export interface PageLabels {
   now: { born: string; years: string }
 }
 
-function Verdict({ r }: { r: MetricResult }) {
+export function Verdict({ r }: { r: MetricResult }) {
   const t = r.trend
   if (!t) return <span className="stamp none">Too few years</span>
   if (t.significant) return <span className={`stamp real ${t.direction}`}>Real change</span>
@@ -64,6 +64,7 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
     <div className={`note ${worse ? 'worse' : 'better'}`}>
       <p className="line">{line}</p>
       <Verdict r={r} />
+      <Sparkline r={r} />
       {trendWords && <p className="trendwords">{trendWords}</p>}
       {future !== null && (
         <p className="future">

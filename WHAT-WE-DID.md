@@ -27,6 +27,7 @@ All work happened on 13–14 November 2026.
 | 13 Nov, 23:00 to midnight | **Simplified every visible word.** Removed slopes, confidence intervals and p-values from the cards; statistics now live only behind "tap any number" and the "Details for the curious" fold. Plain "How do we know?" panel. Renamed "Can't tell" to **No clear change**. Added the hint when the two periods overlap. |
 | 14 Nov, 00:00 | Added **"Why might this be?"**: global reasons, what the country was going through in each era, life choices that add heat, sources. Added the **pace line** (the world is warming about 10 times faster than when it left the last ice age). Added **"Born 2040, if it keeps going"**, a straight-line what-if on every card with a real change. Commit `56d151b`. |
 | 14 Nov, 06:46 | Added **Egypt** to the country context (Kuwait and Egypt have entries; every other country gets a generic list). Commit `d19d76a`. |
+| 14 Nov, morning | Added the **case file** (every metric of the city ranked by strength of evidence, with a 45-year sparkline), **sparklines** on the sticky notes, and **Two futures**: a kid born in 2030, 2040 or 2050 if the trend keeps going or slows to half pace, with how each could happen and the main reason highlighted. A what-if, not a forecast. We tried NASA POWER's climate-projection API (NEX-GDDP-CMIP6) for real model data, but it returned only missing values. |
 
 ## 3. How it works
 
@@ -41,7 +42,7 @@ All work happened on 13–14 November 2026.
 - For each year 1981–2025 we count things people feel: hot days, hot nights, heatwave days, frost days, rainy days, heavy-rain days, the biggest downpour, the longest dry spell, sticky days, perfect outdoor days, training days. "Hot" means hot **for this city**: above the 90th percentile of 1981–2010, so Kuwait and London each get their own bar.
 - "Then" and "Now" are the average over each ten-year period. The sticky note shows the difference.
 - The stamp comes from a **Mann-Kendall trend test** (with the Hamed–Rao correction for years that are like their neighbours) on the full 45-year series, with **Sen's slope** for the size of the trend. **Real change** = p < 0.05. **No clear change** = the years jump around with no steady direction.
-- The JavaScript statistics were checked against the Python packages `pymannkendall` and `scipy` on the same series. 46 automated tests pass (`npm test` in `web/`).
+- The JavaScript statistics were checked against the Python packages `pymannkendall` and `scipy` on the same series. 53 automated tests pass (`npm test` in `web/`).
 - "Born 2040, if it keeps going" is the trend line stretched to the years 2040–2049. It is labelled as a what-if, not a forecast, and only appears where the change is real.
 
 ### The page, top to bottom
@@ -90,7 +91,7 @@ Open the address it prints (usually http://localhost:5173). Other commands, all 
 
 | Command | What it does |
 |---|---|
-| `npm test` | runs the 46 tests |
+| `npm test` | runs the 53 tests |
 | `npm run typecheck` | TypeScript check |
 | `npm run build` | production build into `web/dist/` |
 
