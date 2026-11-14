@@ -42,7 +42,7 @@ export function GlobalContext({ a, cityName }: { a: CityAnalysis; cityName: stri
 export function Methods({ a, d, lens, cityName }: { a: CityAnalysis; d: DailySeries; lens: Lens; cityName: string }) {
   const ids = new Set(lens.metrics.map((m) => m.metric))
   const used = METRICS.filter((m) => ids.has(m.id))
-  const others = METRICS.filter((m) => !ids.has(m.id) && m.id !== 'mean_temp')
+  const others = METRICS.filter((m) => !ids.has(m.id))
   const maxMissing = Math.max(0, ...Object.values(a.results).flatMap((r) => r.annual.missing))
   return (
     <details className="methods">

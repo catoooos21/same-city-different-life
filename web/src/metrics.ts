@@ -174,11 +174,12 @@ export function annualSeries(def: MetricDef, d: DailySeries, ctx: CityContext): 
       continue
     }
     let v = 0
-    if (def.id === 'mean_temp') {
+    if (c.kind === 'mean' || c.kind === 'sum') {
       let s = 0
       let k = 0
-      for (let i = i0; i < i0 + len; i++) if (!miss[i]) (s += d.values.T2M[i]), k++
-      v = k ? s / k : NaN
+      for (let i = i0; i < i0 + len; i++) if (!miss[i]) (s += c.value(dayAt(d, i))), k++
+      // a total is scaled to a full year when a few days are missing, so a gap does not look like a dry year
+      v = k ? (c.kind === 'mean' ? s / k : (s * len) / k) : NaN
     } else if (c.kind === 'count') {
       for (let i = i0; i < i0 + len; i++) v += flag[i]
     } else if (c.kind === 'run_days') {

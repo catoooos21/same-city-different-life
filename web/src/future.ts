@@ -7,6 +7,7 @@
  */
 import { CHILDHOOD_LENGTH, YEARS } from './config/metrics'
 import type { MetricResult } from './metrics'
+import { clampValue } from './units'
 
 /** Birth years the visitor can pick for the future kid. */
 export const FUTURE_BIRTH_YEARS = [2030, 2040, 2050]
@@ -24,7 +25,7 @@ export interface WhatIf {
 }
 
 function clamp(r: MetricResult, v: number): number {
-  return r.def.unit === 'days' ? Math.max(0, Math.min(366, v)) : Math.max(0, v)
+  return clampValue(r.def, v)
 }
 
 /**

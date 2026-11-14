@@ -19,9 +19,16 @@ export function callOf(r: MetricResult): Call | null {
 
 /** Metrics that make a case in this city: happens here, has a trend test, is a card metric. Config order. */
 export function caseMetrics(a: CityAnalysis): MetricResult[] {
-  return METRICS.filter((m) => m.id !== 'mean_temp')
+  return METRICS.filter((m) => !m.basic)
     .map((m) => a.results[m.id])
     .filter((r): r is MetricResult => !!r && r.shown && r.trend !== null)
+}
+
+/** The plain variables (average temperature, daytime high, night-time low, yearly rain), in config order. */
+export function basicMetrics(a: CityAnalysis): MetricResult[] {
+  return METRICS.filter((m) => m.basic)
+    .map((m) => a.results[m.id])
+    .filter((r): r is MetricResult => !!r && r.trend !== null)
 }
 
 /**
@@ -91,10 +98,10 @@ export interface ComparedMetric {
   match: Match
 }
 
-/** Every card metric that makes a case in at least one of the two cities, in config order. */
+/** The basics, then every card metric that makes a case in at least one of the two cities, in config order. */
 export function compareCities(a: CityAnalysis, b: CityAnalysis): ComparedMetric[] {
-  const inA = new Map(caseMetrics(a).map((r) => [r.def.id, r]))
-  const inB = new Map(caseMetrics(b).map((r) => [r.def.id, r]))
+  const inA = new Map([...basicMetrics(a), ...caseMetrics(a)].map((r) => [r.def.id, r]))
+  const inB = new Map([...basicMetrics(b), ...caseMetrics(b)].map((r) => [r.def.id, r]))
   return METRICS.filter((m) => inA.has(m.id) || inB.has(m.id)).map((m) => {
     const ra = inA.get(m.id) ?? null
     const rb = inB.get(m.id) ?? null

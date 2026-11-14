@@ -116,9 +116,10 @@ export function Compare({ a, city, then, now, vs, onVs }: { a: CityAnalysis; cit
               const def = METRIC_BY_ID[row.id]
               const isOpen = open === row.id
               return (
-                <div className={`crow ${row.match} ${isOpen ? 'open' : ''}`} key={row.id}>
+                <div className={`crow ${row.match} ${isOpen ? 'open' : ''} ${def.basic ? 'basic' : ''}`} key={row.id}>
                   <button type="button" className="cwhat" onClick={() => setOpen(isOpen ? null : row.id)} aria-expanded={isOpen}>
                     <strong>{def.name}</strong>
+                    {def.basic && <span className="basictag">basics</span>}
                     <span className={`matchtag ${row.match}`}>{matchWords(row.match, city.name, other.name)}</span>
                   </button>
                   <div className="cside">
@@ -151,7 +152,7 @@ export function Compare({ a, city, then, now, vs, onVs }: { a: CityAnalysis; cit
           </div>
           <p className="muted small">
             “Hot” is measured against each city’s own {YEARS.first}–2010 weather, so a hot day in {city.name} and a hot day in {other.name} are different temperatures. Compare the directions, not the counts. Tap a row to see both
-            charts.
+            charts. The basics at the top are plain °C and mm, so those you can compare directly.
           </p>
         </>
       )}

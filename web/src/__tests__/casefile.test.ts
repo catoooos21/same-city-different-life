@@ -26,7 +26,7 @@ describe('case file', () => {
 
   it('lists only card metrics that happen here and have a trend test', () => {
     expect(cases.length).toBeGreaterThan(5)
-    expect(cases.some((r) => r.def.id === 'mean_temp')).toBe(false)
+    expect(cases.some((r) => r.def.basic)).toBe(false)
     expect(cases.every((r) => r.shown && r.trend !== null)).toBe(true)
     // Kuwait City has no frost in the baseline, so it is not a case there
     expect(cases.some((r) => r.def.id === 'frost_days')).toBe(false)
@@ -58,9 +58,9 @@ describe('case file', () => {
     expect(new Set(ids).size).toBe(cases.length)
     for (const g of groups) expect(g.real).toBe(g.cases.filter((r) => r.trend!.significant).length)
     // every card metric belongs to a named group
-    for (const m of METRICS) if (m.id !== 'mean_temp') expect(CASE_GROUPS.some((g) => g.metrics.includes(m.id))).toBe(true)
+    for (const m of METRICS) if (!m.basic) expect(CASE_GROUPS.some((g) => g.metrics.includes(m.id))).toBe(true)
     // the rain group is exactly the less-certain metrics
-    expect([...CASE_GROUPS[1].metrics].sort()).toEqual(METRICS.filter((m) => m.lessCertain).map((m) => m.id).sort())
+    expect([...CASE_GROUPS[1].metrics].sort()).toEqual(METRICS.filter((m) => m.lessCertain && !m.basic).map((m) => m.id).sort())
   })
 })
 
@@ -79,7 +79,9 @@ describe('two cities side by side', () => {
     const l = analyse(loadDemo('london'), childhood(1981), childhood(2015))
     const rows = compareCities(k, l)
     const byId = Object.fromEntries(rows.map((r) => [r.id, r]))
-    expect(rows.some((r) => r.id === 'mean_temp')).toBe(false)
+    // the basics come first, in plain units, and both cities are warming
+    expect(rows.slice(0, 4).map((r) => r.id)).toEqual(['mean_temp', 'mean_tmax', 'mean_tmin', 'rain_total'])
+    expect(byId.mean_temp.match).toBe('same')
     // both warm: unusually hot days go up in both
     expect(byId.hot_days.match).toBe('same')
     // frost happens in London but not in Kuwait City; 35 C days the other way round

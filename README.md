@@ -77,6 +77,10 @@ Local thresholds use each city’s own 1981–2010 baseline, so “hot” means 
 | Sticky days | daily mean dew point ≥ 20 °C | |
 | Perfect outdoor days | max 18–30 °C, precipitation < 1 mm, dew point < 20 °C | |
 | Good training days | mean 5–20 °C, precipitation < 1 mm, dew point < 16 °C | |
+| Average temperature | yearly mean of the daily mean, °C (a basic: shown in the case file, not as a card) | |
+| Average daytime high | yearly mean of the daily maximum, °C (basic) | |
+| Average night-time low | yearly mean of the daily minimum, °C (basic) | |
+| Rain in the year | total precipitation of the calendar year, mm (basic) | PRCPTOT (variant) |
 
 “Perfect outdoor days” follows the “outdoor days” idea of Choi, Y.-W., Khalifa, M. and Eltahir, E. A. B.
 (2024), *North–South disparity in impact of climate change on “outdoor days”*, Journal of Climate,
@@ -120,7 +124,7 @@ and the real Kuwait hot-days series). The Python reference lives in [pipeline/st
 regenerate the fixtures with `python -m pipeline.tests.make_js_fixtures`.
 
 ```bash
-cd web && npm test            # 62 tests: statistics vs Python, calendar, metrics engine, missing-day rule, case file, two cities, two futures
+cd web && npm test            # 71 tests: statistics vs Python, calendar, metrics engine, missing-day rule, the basics, case file, two cities, two futures
 python -m pytest pipeline/tests   # Python reference tests
 ```
 

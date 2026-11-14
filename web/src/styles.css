@@ -267,6 +267,9 @@ li.main { list-style: none; margin-left: -1.1rem; margin-bottom: 0.6rem; padding
 .caserow .what small { display: block; color: var(--muted); font-size: 0.82rem; line-height: 1.25; }
 .caserow .spark { margin-top: 0; height: 32px; }
 .caserow .howmuch { font-size: 0.92rem; }
+.caserow .howmuch small { display: block; color: var(--muted); font-size: 0.82rem; }
+.casegroup.basics .caselist li { background: #f4f8fc; border-color: #c3d3e6; }
+.basictag { font-size: 0.65rem; font-weight: 800; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ink-now); border: 1.5px solid currentColor; border-radius: 3px; padding: 0 0.35rem; }
 .caseopen { padding: 0.4rem 0.9rem 0.8rem; border-top: 1px dashed #c9b995; }
 
 .globalline { background: var(--paper-then); padding: 0.7rem 1rem; margin-top: 1.2rem; box-shadow: var(--shadow); transform: rotate(0.4deg); }

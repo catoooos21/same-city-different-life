@@ -1,5 +1,6 @@
 import type { MetricResult, Period } from '../metrics'
 import { YEARS } from '../config/metrics'
+import { axisFromZero, unitShort } from '../units'
 
 /** Every year since 1981 as hand-drawn-looking dots, with Sen's slope line and the two periods shaded. */
 export function YearChart({ r, then, now, height = 180, showTrend = true }: { r: MetricResult; then: Period; now: Period; height?: number; showTrend?: boolean }) {
@@ -17,7 +18,7 @@ export function YearChart({ r, then, now, height = 180, showTrend = true }: { r:
     lo = Math.min(lo, t.intercept + t.slope * YEARS.first, t.intercept + t.slope * YEARS.last)
     hi = Math.max(hi, t.intercept + t.slope * YEARS.first, t.intercept + t.slope * YEARS.last)
   }
-  if (lo > 0) lo = 0
+  if (lo > 0 && axisFromZero(r.def)) lo = 0
   if (hi === lo) hi = lo + 1
   const span = hi - lo
   lo -= span * 0.05
@@ -29,7 +30,7 @@ export function YearChart({ r, then, now, height = 180, showTrend = true }: { r:
   const b2 = bandX(now)
   const ticks = niceTicks(lo, hi, 4)
   const t = showTrend ? r.trend : null
-  const unit = r.def.unit === 'mm' ? 'mm' : 'days'
+  const unit = unitShort(r.def)
   const title = `${r.def.name}, ${YEARS.first}–${YEARS.last}`
 
   return (

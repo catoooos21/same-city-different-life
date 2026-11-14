@@ -58,6 +58,10 @@ export interface Day {
 export type MetricKind =
   | { kind: 'count'; test: (d: Day, c: CityContext) => boolean }
   | { kind: 'max'; value: (d: Day) => number }
+  /** Average of a daily value over the year. */
+  | { kind: 'mean'; value: (d: Day) => number }
+  /** Total of a daily value over the year (scaled to a full year when a few days are missing). */
+  | { kind: 'sum'; value: (d: Day) => number }
   | { kind: 'longest_run'; test: (d: Day, c: CityContext) => boolean }
   | { kind: 'run_days'; test: (d: Day, c: CityContext) => boolean; minRun: number }
 
@@ -68,7 +72,14 @@ export interface MetricDef {
   /** One short everyday-words line for the simple panel. */
   plain?: string
   /** Unit of the annual value. */
-  unit: 'days' | 'mm'
+  unit: 'days' | 'mm' | '°C'
+  /** What the yearly number means on a tile, when "days a year" or the bare unit is not enough. */
+  unitLong?: string
+  /**
+   * A plain variable (temperature, rain) and not a count of days. Shown as "The basics" in the
+   * case file and the city comparison; not a scrapbook card.
+   */
+  basic?: boolean
   /** Which POWER parameters a day needs; a day missing any of them is a missing day. */
   needs: Param[]
   definition: string
@@ -88,6 +99,52 @@ export interface MetricDef {
 const T = THRESHOLDS
 
 export const METRICS: MetricDef[] = [
+  {
+    id: 'mean_temp',
+    name: 'Average temperature',
+    plain: 'Every day and night of the year, averaged.',
+    unit: '°C',
+    unitLong: '°C, yearly average',
+    basic: true,
+    needs: ['T2M'],
+    definition: 'Annual mean of the daily mean air temperature at 2 m, in °C. Also used to compare this city with the global GISTEMP record.',
+    compute: { kind: 'mean', value: (d) => d.T2M },
+  },
+  {
+    id: 'mean_tmax',
+    name: 'Average daytime high',
+    plain: 'The hottest moment of each day, averaged over the year.',
+    unit: '°C',
+    unitLong: '°C, yearly average',
+    basic: true,
+    needs: ['T2M_MAX'],
+    definition: 'Annual mean of the daily maximum air temperature at 2 m, in °C.',
+    compute: { kind: 'mean', value: (d) => d.T2M_MAX },
+  },
+  {
+    id: 'mean_tmin',
+    name: 'Average night-time low',
+    plain: 'The coolest moment of each night, averaged over the year.',
+    unit: '°C',
+    unitLong: '°C, yearly average',
+    basic: true,
+    needs: ['T2M_MIN'],
+    definition: 'Annual mean of the daily minimum air temperature at 2 m, in °C.',
+    compute: { kind: 'mean', value: (d) => d.T2M_MIN },
+  },
+  {
+    id: 'rain_total',
+    name: 'Rain in the year',
+    plain: 'All the rain of the year, added up.',
+    unit: 'mm',
+    unitLong: 'mm in the year',
+    basic: true,
+    lessCertain: true,
+    needs: ['PRECTOTCORR'],
+    definition: 'Total precipitation of the calendar year, in mm (ETCCDI PRCPTOT counts wet days only; this counts every day). When a few days are missing the total is scaled to a full year.',
+    etccdi: 'PRCPTOT (variant)',
+    compute: { kind: 'sum', value: (d) => d.PRECTOTCORR },
+  },
   {
     id: 'hot_days',
     name: 'Hot days',
@@ -177,6 +234,7 @@ export const METRICS: MetricDef[] = [
     name: 'Biggest downpour',
     plain: 'Rain on the wettest day of the year.',
     unit: 'mm',
+    unitLong: 'mm on the wettest day',
     needs: ['PRECTOTCORR'],
     definition: 'Precipitation on the wettest day of the year, in mm.',
     etccdi: 'Rx1day',
@@ -227,14 +285,6 @@ export const METRICS: MetricDef[] = [
       kind: 'count',
       test: (d) => d.T2M >= T.training.meanLow && d.T2M <= T.training.meanHigh && d.PRECTOTCORR < T.training.rainBelowMm && d.T2MDEW < T.training.dewBelowC,
     },
-  },
-  {
-    id: 'mean_temp',
-    name: 'Mean temperature',
-    unit: 'days', // not shown as a card; used for the "vs the world" comparison (°C)
-    needs: ['T2M'],
-    definition: 'Annual mean of the daily mean temperature, °C. Used only to compare this city with the global GISTEMP record.',
-    compute: { kind: 'max', value: (d) => d.T2M }, // placeholder kind; handled specially in metrics.ts
   },
 ]
 

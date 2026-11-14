@@ -4,10 +4,11 @@ import { CHILDHOOD_LENGTH, YEARS } from '../config/metrics'
 import type { CityAnalysis, MetricResult } from '../metrics'
 import { FUTURE_BIRTH_YEARS, SLOWER_PACE, whatIf, type WhatIf } from '../future'
 import { fmtNum } from '../format'
+import { unitLong } from '../units'
 import { FUTURE_NOTE, FUTURE_SOURCES, KEEPS_GOING, ON_TOP_COOLER, ON_TOP_HOTTER, SLOWS_DOWN } from '../config/context'
 
 function unitWords(r: MetricResult): string {
-  return r.def.unit === 'mm' ? 'mm on the wettest day' : 'days a year'
+  return unitLong(r.def)
 }
 
 function FutureTile({ w, r, kind }: { w: WhatIf; r: MetricResult; kind: 'same' | 'slower' }) {

@@ -7,6 +7,7 @@ import { fmtNum, fmtP, fmtSigned } from '../format'
 import { CalendarChart, Sparkline, YearChart } from './YearChart'
 import { FUTURE_BIRTH_YEAR } from '../config/context'
 import { CHILDHOOD_LENGTH, YEARS } from '../config/metrics'
+import { clampValue, rateDigits, unitLong, unitShort, valueDigits } from '../units'
 
 export interface PageLabels {
   then: { born: string; years: string }
@@ -34,11 +35,10 @@ export const RAIN_CAUTION =
   'Rain at a single point is the least certain part of this data. The trend test passed, but treat this one with more care than the heat numbers.'
 
 function Tile({ r, stat, side, onClick, active }: { r: MetricResult; stat: { mean: number | null; validYears: number; totalYears: number }; side: 'then' | 'now'; onClick: () => void; active: boolean }) {
-  const mm = r.def.unit === 'mm'
   return (
     <button type="button" className={`tile ${side} ${active ? 'active' : ''}`} onClick={onClick} aria-pressed={active}>
-      <span className="big">{fmtNum(stat.mean, mm ? 0 : 0)}</span>
-      <span className="unit">{mm ? 'mm on the wettest day' : 'days a year'}</span>
+      <span className="big">{fmtNum(stat.mean, valueDigits(r.def))}</span>
+      <span className="unit">{unitLong(r.def)}</span>
       {stat.validYears < stat.totalYears && (
         <span className="tiny">
           {stat.validYears} of {stat.totalYears} years complete
@@ -110,10 +110,8 @@ export function projectFuture(r: MetricResult): number | null {
   const t = r.trend
   if (!t || !t.significant) return null
   const midYear = FUTURE_BIRTH_YEAR + (CHILDHOOD_LENGTH - 1) / 2
-  let v = t.intercept + t.slope * midYear
-  if (r.def.unit === 'days') v = Math.max(0, Math.min(366, v))
-  else v = Math.max(0, v)
-  return v
+  const v = t.intercept + t.slope * midYear
+  return clampValue(r.def, v)
 }
 
 export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; labels: PageLabels }) {
@@ -203,20 +201,22 @@ function ThreeCells({ children, last }: { children: React.ReactNode; last: boole
 export function TrendSentence({ r }: { r: MetricResult }) {
   const t = r.trend
   if (!t) return <p className="muted">Fewer than ten complete years, so no trend test was run.</p>
-  const unit = r.def.unit === 'mm' ? 'mm' : 'days'
   const s = r.slopePerDecade!
   const [lo, hi] = r.ciPerDecade!
   const dir = s > 0 ? 'up' : 'down'
   const n = Math.abs(s)
+  const unit = unitShort(r.def)
+  // temperature moves in tenths of a degree per decade, so it gets one more decimal than counts of days
+  const dp = r.def.unit === '°C' ? 2 : 1
   return (
     <p className="trendsentence">
       {t.significant ? (
         <>
-          <strong>Real change.</strong> Going {dir} by about {n.toFixed(n < 2 ? 1 : 0)} {unit} every ten years (somewhere between {fmtSigned(lo, 1)} and {fmtSigned(hi, 1)}).
+          <strong>Real change.</strong> Going {dir} by about {n.toFixed(rateDigits(r.def, n))} {unit} every ten years (somewhere between {fmtSigned(lo, dp)} and {fmtSigned(hi, dp)}).
         </>
       ) : (
         <>
-          <strong>No clear change.</strong> The best guess is {fmtSigned(s, 1)} {unit} every ten years, but it could be anywhere between {fmtSigned(lo, 1)} and {fmtSigned(hi, 1)}, so no steady direction.
+          <strong>No clear change.</strong> The best guess is {fmtSigned(s, dp)} {unit} every ten years, but it could be anywhere between {fmtSigned(lo, dp)} and {fmtSigned(hi, dp)}, so no steady direction.
         </>
       )}{' '}
       <small className="muted">
