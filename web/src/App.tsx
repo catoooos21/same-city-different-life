@@ -10,6 +10,8 @@ import { Compare } from './components/Compare'
 import { SecondOpinion } from './components/SecondOpinion'
 import { CountryStanding } from './components/CountryStanding'
 import { Land } from './components/Land'
+import { Headline } from './components/Headline'
+import { Cost } from './components/Cost'
 import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
 import { Scrapbook, periodLabel, type PageLabels } from './components/Scrapbook'
@@ -264,9 +266,10 @@ function Result(props: {
       )}
       {analysis && daily && (
         <>
-          <CountryStanding city={city} />
+          <Headline a={analysis} lens={lens} />
           <Scrapbook a={analysis} lens={lens} labels={labels} />
           <GlobalContext a={analysis} cityName={city.name} />
+          <CountryStanding city={city} />
           <p className="foldbar">
             <span>Dig deeper:</span>
             <button
@@ -286,6 +289,9 @@ function Result(props: {
           </p>
           <Fold title="Two futures" teaser="What someone born in 2040 could live through, two ways.">
             <FutureBook a={analysis} lens={lens} />
+          </Fold>
+          <Fold title="What it costs" teaser="Electricity, lost work and damage: the money side of the heat.">
+            <Cost city={city} a={analysis} d={daily} />
           </Fold>
           <Fold title="The case file" teaser={`Everything we checked in ${city.name}, grouped by kind of evidence.`}>
             <CaseFile a={analysis} cityName={city.name} />

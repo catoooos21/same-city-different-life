@@ -1,5 +1,5 @@
 /* Where the country stands: one stamp, what it is doing, why. Tokens from styles.css. */
-.standing { background: var(--paper-now); box-shadow: var(--shadow); padding: 0.9rem 1.2rem 0.8rem; margin: 0 0 1.4rem; border-top: 6px solid var(--grey); }
+.standing { background: var(--paper-now); box-shadow: var(--shadow); padding: 0.9rem 1.2rem 0.8rem; margin: 1.6rem 0 0; border-top: 6px solid var(--grey); }
 .standing.improving { border-top-color: var(--better); }
 .standing.starting { border-top-color: #d9a441; }
 .standing.worse { border-top-color: var(--worse); }
