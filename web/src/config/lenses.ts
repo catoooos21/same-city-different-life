@@ -5,9 +5,9 @@
 
 export interface LensMetric {
   metric: string
-  /** Short card title, e.g. "Too hot to play". */
+  /** Short card title, e.g. "Unusually hot days". Must not claim more than the metric measures. */
   title: string
-  /** Phrase completing "N more/fewer ___, every year", e.g. "days too hot to play outside". */
+  /** Phrase completing "N more/fewer ___, every year", e.g. "unusually hot days". */
   phrase: string
   /** Phrase for the biggest-downpour style metrics (unit mm): "mm in the biggest downpour". */
   moreIsBad: boolean
@@ -35,8 +35,8 @@ export const LENSES: Lens[] = [
     subject: 'A kid born in',
     intro: 'Same city. Same age. A different childhood.',
     metrics: [
-      { metric: 'hot_days', title: 'Too hot to play outside', phrase: 'days too hot to play outside', moreIsBad: true },
-      { metric: 'hot_nights', title: 'Too hot to sleep', phrase: 'nights too hot to sleep', moreIsBad: true },
+      { metric: 'hot_days', title: 'Unusually hot days', phrase: 'unusually hot days', moreIsBad: true },
+      { metric: 'hot_nights', title: 'Unusually warm nights', phrase: 'unusually warm nights', moreIsBad: true },
       { metric: 'rainy_days', title: 'Rainy days', phrase: 'rainy days', moreIsBad: false },
       { metric: 'sticky_days', title: 'Sticky, muggy days', phrase: 'sticky days', moreIsBad: true },
       { metric: 'perfect_days', title: 'Perfect play days', phrase: 'perfect play days', moreIsBad: false },
@@ -51,7 +51,7 @@ export const LENSES: Lens[] = [
     intro: 'Same job. Same city. Different working days.',
     metrics: [
       { metric: 'very_hot_days', title: 'Very hot workdays (35 °C+)', phrase: 'very hot workdays', moreIsBad: true },
-      { metric: 'hot_days', title: 'Hot days (local)', phrase: 'locally hot days', moreIsBad: true },
+      { metric: 'hot_days', title: 'Unusually hot days', phrase: 'unusually hot days', moreIsBad: true },
       { metric: 'heatwave_days', title: 'Heatwave days', phrase: 'heatwave days', moreIsBad: true },
       { metric: 'sticky_days', title: 'Sticky, muggy days', phrase: 'sticky days', moreIsBad: true },
     ],
@@ -79,7 +79,7 @@ export const LENSES: Lens[] = [
     intro: 'Same route. Different training calendar.',
     metrics: [
       { metric: 'training_days', title: 'Good training days', phrase: 'good training days', moreIsBad: false },
-      { metric: 'hot_days', title: 'Too hot to run', phrase: 'days too hot to run', moreIsBad: true },
+      { metric: 'hot_days', title: 'Unusually hot days', phrase: 'unusually hot days', moreIsBad: true },
       { metric: 'sticky_days', title: 'Sticky, muggy days', phrase: 'sticky days', moreIsBad: true },
     ],
     calendar: true,
@@ -91,7 +91,7 @@ export const LENSES: Lens[] = [
     subject: 'An older person living here from',
     intro: 'Same home. Different summers.',
     metrics: [
-      { metric: 'hot_nights', title: 'Nights too hot to sleep', phrase: 'nights too hot to sleep', moreIsBad: true },
+      { metric: 'hot_nights', title: 'Unusually warm nights', phrase: 'unusually warm nights', moreIsBad: true },
       { metric: 'tropical_nights', title: 'Tropical nights (20 °C+)', phrase: 'tropical nights', moreIsBad: true },
       { metric: 'heatwave_days', title: 'Heatwave days', phrase: 'heatwave days', moreIsBad: true },
       { metric: 'very_hot_days', title: 'Very hot days (35 °C+)', phrase: 'very hot days', moreIsBad: true },

@@ -1,10 +1,11 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { describe, expect, it } from 'vitest'
-import { PARAMS, YEARS, type Param } from '../config/metrics'
+import { METRICS, PARAMS, YEARS, type Param } from '../config/metrics'
 import { analyse, childhood } from '../metrics'
 import { daysBetween, type DailySeries } from '../power'
-import { callOf, caseMetrics, rankCases } from '../casefile'
+import { CASE_GROUPS, callOf, caseMetrics, compareCities, groupCases, matchCalls, rankCases } from '../casefile'
+import { parseHash, toHash } from '../state'
 
 function loadDemo(id: string): DailySeries {
   const j = JSON.parse(readFileSync(resolve(__dirname, `../../public/demo/${id}.json`), 'utf-8'))
@@ -47,5 +48,53 @@ describe('case file', () => {
     if (firstNone >= 0) expect(ranked.slice(firstNone).every((r) => !r.trend!.significant)).toBe(true)
     const real = ranked.filter((r) => r.trend!.significant)
     for (let i = 1; i < real.length; i++) expect(Math.abs(real[i - 1].trend!.z)).toBeGreaterThanOrEqual(Math.abs(real[i].trend!.z))
+  })
+
+  it('groups cases by what they measure, losing none and repeating none', () => {
+    const groups = groupCases(cases)
+    expect(groups.map((g) => g.id)).toEqual(['heat', 'rain', 'comfort'])
+    const ids = groups.flatMap((g) => g.cases.map((r) => r.def.id))
+    expect(ids).toHaveLength(cases.length)
+    expect(new Set(ids).size).toBe(cases.length)
+    for (const g of groups) expect(g.real).toBe(g.cases.filter((r) => r.trend!.significant).length)
+    // every card metric belongs to a named group
+    for (const m of METRICS) if (m.id !== 'mean_temp') expect(CASE_GROUPS.some((g) => g.metrics.includes(m.id))).toBe(true)
+    // the rain group is exactly the less-certain metrics
+    expect([...CASE_GROUPS[1].metrics].sort()).toEqual(METRICS.filter((m) => m.lessCertain).map((m) => m.id).sort())
+  })
+})
+
+describe('two cities side by side', () => {
+  it('names how two calls compare', () => {
+    expect(matchCalls('up', 'up')).toBe('same')
+    expect(matchCalls('up', 'down')).toBe('opposite')
+    expect(matchCalls('down', 'none')).toBe('onlyA')
+    expect(matchCalls('none', 'up')).toBe('onlyB')
+    expect(matchCalls('none', 'none')).toBe('neither')
+    expect(matchCalls(null, 'up')).toBe('missing')
+  })
+
+  it('compares Kuwait City with London metric by metric', () => {
+    const k = analyse(loadDemo('kuwait-city'), childhood(1981), childhood(2015))
+    const l = analyse(loadDemo('london'), childhood(1981), childhood(2015))
+    const rows = compareCities(k, l)
+    const byId = Object.fromEntries(rows.map((r) => [r.id, r]))
+    expect(rows.some((r) => r.id === 'mean_temp')).toBe(false)
+    // both warm: unusually hot days go up in both
+    expect(byId.hot_days.match).toBe('same')
+    // frost happens in London but not in Kuwait City; 35 C days the other way round
+    expect(byId.frost_days.a).toBeNull()
+    expect(byId.frost_days.match).toBe('missing')
+    expect(byId.very_hot_days.b).toBeNull()
+    for (const r of rows) expect(r.match).toBe(matchCalls(r.a ? callOf(r.a) : null, r.b ? callOf(r.b) : null))
+  })
+
+  it('keeps the second city in the link', () => {
+    const h = '#name=Kuwait+City&lat=29.3759&lon=47.9774&vsname=London&vscountry=United+Kingdom&vslat=51.5085&vslon=-0.1257'
+    const q = parseHash(h)
+    expect(q.vs).toEqual({ name: 'London', country: 'United Kingdom', lat: 51.5085, lon: -0.1257 })
+    expect(parseHash(toHash(q)).vs).toEqual(q.vs)
+    expect(parseHash('#name=Kuwait+City&lat=29.3759&lon=47.9774').vs).toBeNull()
+    expect(toHash(parseHash('#name=Kuwait+City&lat=29.3759&lon=47.9774'))).not.toContain('vs')
   })
 })

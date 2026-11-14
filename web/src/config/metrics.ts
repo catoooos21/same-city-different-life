@@ -75,6 +75,11 @@ export interface MetricDef {
   etccdi?: string
   /** Only show this metric when the baseline average passes this test ("show only where it happens"). */
   showIf?: (baselineMean: number) => boolean
+  /**
+   * Built only on precipitation. MERRA-2 rain at a single point is less certain than temperature,
+   * so a significant trend here gets a softer stamp and a caution line.
+   */
+  lessCertain?: boolean
   /** Monthly breakdown makes sense (outdoor calendar). */
   monthly?: boolean
   compute: MetricKind
@@ -146,6 +151,7 @@ export const METRICS: MetricDef[] = [
   },
   {
     id: 'rainy_days',
+    lessCertain: true,
     name: 'Rainy days',
     plain: 'At least 1 mm of rain.',
     unit: 'days',
@@ -156,6 +162,7 @@ export const METRICS: MetricDef[] = [
   },
   {
     id: 'heavy_rain_days',
+    lessCertain: true,
     name: 'Heavy rain days',
     plain: 'At least 10 mm of rain.',
     unit: 'days',
@@ -166,6 +173,7 @@ export const METRICS: MetricDef[] = [
   },
   {
     id: 'biggest_downpour',
+    lessCertain: true,
     name: 'Biggest downpour',
     plain: 'Rain on the wettest day of the year.',
     unit: 'mm',
@@ -176,6 +184,7 @@ export const METRICS: MetricDef[] = [
   },
   {
     id: 'longest_dry_spell',
+    lessCertain: true,
     name: 'Longest dry spell',
     plain: 'Most days in a row without rain.',
     unit: 'days',

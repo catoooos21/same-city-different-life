@@ -10,7 +10,10 @@ import type { MetricResult } from './metrics'
 
 /** Birth years the visitor can pick for the future kid. */
 export const FUTURE_BIRTH_YEARS = [2030, 2040, 2050]
-/** Pace of the second future, as a fraction of the 1981-2025 pace. */
+/**
+ * Pace of the second future, as a fraction of the 1981-2025 pace. An illustrative number chosen by
+ * us, NOT a scenario from climate science; the page labels it "example".
+ */
 export const SLOWER_PACE = 0.5
 
 export interface WhatIf {

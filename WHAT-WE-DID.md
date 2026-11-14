@@ -11,9 +11,9 @@ This file is the plain story of the project: what the app is, what we built, in 
 
 ## 1. The idea in one paragraph
 
-Pick any city on Earth. The app opens two scrapbook pages side by side: a kid born in 1981 and a kid born in 2015, same city, first ten years of life. Between the pages, sticky notes say what changed in everyday words ("37 more days too hot to play outside, every year") with a stamp that says **Real change** or **No clear change**. You can switch who you are (kid, outdoor worker, farmer, runner, older person, traveller) and the same weather is told from that life. Everything comes from 45 years of NASA daily weather data, computed live in the browser. No account, no key, no server.
+Pick any city on Earth. The app opens two scrapbook pages side by side: a kid born in 1981 and a kid born in 2015, same city, first ten years of life. Between the pages, sticky notes say what changed in everyday words ("37 more unusually hot days, every year") with a stamp that says **Real change** or **No clear change**. You can switch who you are (kid, outdoor worker, farmer, runner, older person, traveller) and the same weather is told from that life. Everything comes from 45 years of NASA daily weather data, computed live in the browser. No account, no key, no server.
 
-The problem it answers: climate numbers like "+1.2 °C" mean nothing to most people. Days you cannot play outside, nights too hot to sleep, and rainy days you lose do.
+The problem it answers: climate numbers like "+1.2 °C" mean nothing to most people. Unusually hot days, nights that stay warm, and rainy days you lose do.
 
 ## 2. Timeline (what happened, in order)
 
@@ -28,6 +28,7 @@ All work happened on 13–14 November 2026.
 | 14 Nov, 00:00 | Added **"Why might this be?"**: global reasons, what the country was going through in each era, life choices that add heat, sources. Added the **pace line** (the world is warming about 10 times faster than when it left the last ice age). Added **"Born 2040, if it keeps going"**, a straight-line what-if on every card with a real change. Commit `56d151b`. |
 | 14 Nov, 06:46 | Added **Egypt** to the country context (Kuwait and Egypt have entries; every other country gets a generic list). Commit `d19d76a`. |
 | 14 Nov, morning | Added the **case file** (every metric of the city ranked by strength of evidence, with a 45-year sparkline), **sparklines** on the sticky notes, and **Two futures**: a kid born in 2030, 2040 or 2050 if the trend keeps going or slows to half pace, with how each could happen and the main reason highlighted. A what-if, not a forecast. We tried NASA POWER's climate-projection API (NEX-GDDP-CMIP6) for real model data, but it returned only missing values. |
+| 14 Nov, midday | **Honesty pass**, eight fixes. (1) The why-text now says the numbers show the region's climate (MERRA-2 squares are about 50 km wide) and that a city's own heat comes on top and is not in them. (2) Sticky notes are split into "Then vs now" and "All 45 years", and say so when the two disagree. (3) "Too hot to play / sleep" became "Unusually hot days" and "Unusually warm nights", with the plain definition on every card. (4) Rain-only metrics get a softer stamp and a caution line. (5) The case file is grouped into heat, rain and comfort, and counts groups, not lines. (6) **Same question, another city**: a second city side by side, each metric tagged same direction, opposite, or changing in only one. (7) The lower sections start folded. (8) "Half the pace" in Two futures is labelled as an example. |
 
 ## 3. How it works
 
@@ -42,7 +43,7 @@ All work happened on 13–14 November 2026.
 - For each year 1981–2025 we count things people feel: hot days, hot nights, heatwave days, frost days, rainy days, heavy-rain days, the biggest downpour, the longest dry spell, sticky days, perfect outdoor days, training days. "Hot" means hot **for this city**: above the 90th percentile of 1981–2010, so Kuwait and London each get their own bar.
 - "Then" and "Now" are the average over each ten-year period. The sticky note shows the difference.
 - The stamp comes from a **Mann-Kendall trend test** (with the Hamed–Rao correction for years that are like their neighbours) on the full 45-year series, with **Sen's slope** for the size of the trend. **Real change** = p < 0.05. **No clear change** = the years jump around with no steady direction.
-- The JavaScript statistics were checked against the Python packages `pymannkendall` and `scipy` on the same series. 53 automated tests pass (`npm test` in `web/`).
+- The JavaScript statistics were checked against the Python packages `pymannkendall` and `scipy` on the same series. 62 automated tests pass (`npm test` in `web/`).
 - "Born 2040, if it keeps going" is the trend line stretched to the years 2040–2049. It is labelled as a what-if, not a forecast, and only appears where the change is real.
 
 ### The page, top to bottom
@@ -91,7 +92,7 @@ Open the address it prints (usually http://localhost:5173). Other commands, all 
 
 | Command | What it does |
 |---|---|
-| `npm test` | runs the 53 tests |
+| `npm test` | runs the 62 tests |
 | `npm run typecheck` | TypeScript check |
 | `npm run build` | production build into `web/dist/` |
 

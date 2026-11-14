@@ -14,7 +14,7 @@ For every number the app answers the four challenge questions:
 
 | Question | Where it is answered |
 |---|---|
-| **What** is changing | each lens is a list of plain-language metrics (hot days, nights too hot to sleep, rainy days, perfect outdoor days, …) |
+| **What** is changing | each lens is a list of plain-language metrics (unusually hot days, unusually warm nights, rainy days, perfect outdoor days, …) |
 | **Where** | any city (GeoNames, population > 100,000) or any coordinates; the MERRA-2 grid cell for that point |
 | **How much** | Then vs Now averages, their difference, and Sen’s slope per decade with a 95 % confidence interval |
 | **Significant?** | Mann-Kendall test with the Hamed–Rao autocorrelation correction, shown as **Real change** (p < 0.05) or **No clear change** (no significant trend) |
@@ -91,7 +91,7 @@ Defined in [web/src/config/lenses.ts](web/src/config/lenses.ts). Adding a lens i
 
 | Lens | Metrics |
 |---|---|
-| Kid / parent | too hot to play (hot days), too hot to sleep (hot nights), rainy days, sticky days, perfect play days, outdoor calendar |
+| Kid / parent | unusually hot days (hot days), unusually warm nights (hot nights), rainy days, sticky days, perfect play days, outdoor calendar |
 | Outdoor worker | very hot workdays, hot days, heatwave days, sticky days — labelled as a weather proxy, not a safety standard |
 | Farmer / gardener | longest dry spell, heavy rain days, biggest downpour, frost days, rainy days |
 | Runner / athlete | good training days, hot days, sticky days, calendar |
@@ -120,7 +120,7 @@ and the real Kuwait hot-days series). The Python reference lives in [pipeline/st
 regenerate the fixtures with `python -m pipeline.tests.make_js_fixtures`.
 
 ```bash
-cd web && npm test            # 53 tests: statistics vs Python, calendar, metrics engine, missing-day rule, case file, two futures
+cd web && npm test            # 62 tests: statistics vs Python, calendar, metrics engine, missing-day rule, case file, two cities, two futures
 python -m pytest pipeline/tests   # Python reference tests
 ```
 

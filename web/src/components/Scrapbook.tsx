@@ -6,7 +6,7 @@ import { fmtNum, fmtP, fmtSigned } from '../format'
 // fmtP and fmtSigned are used by TrendSentence in the chart drawer only
 import { CalendarChart, Sparkline, YearChart } from './YearChart'
 import { FUTURE_BIRTH_YEAR } from '../config/context'
-import { CHILDHOOD_LENGTH } from '../config/metrics'
+import { CHILDHOOD_LENGTH, YEARS } from '../config/metrics'
 
 export interface PageLabels {
   then: { born: string; years: string }
@@ -16,9 +16,22 @@ export interface PageLabels {
 export function Verdict({ r }: { r: MetricResult }) {
   const t = r.trend
   if (!t) return <span className="stamp none">Too few years</span>
+  if (t.significant && r.def.lessCertain)
+    return (
+      <span className="stampwrap">
+        <span className={`stamp real soft ${t.direction}`}>Real change</span>
+        <span className="rainflag" title={RAIN_CAUTION}>
+          rain: less certain
+        </span>
+      </span>
+    )
   if (t.significant) return <span className={`stamp real ${t.direction}`}>Real change</span>
   return <span className="stamp cant">No clear change</span>
 }
+
+/** Shown wherever a rain-only metric gets a "Real change" stamp. */
+export const RAIN_CAUTION =
+  'Rain at a single point is the least certain part of this data. The trend test passed, but treat this one with more care than the heat numbers.'
 
 function Tile({ r, stat, side, onClick, active }: { r: MetricResult; stat: { mean: number | null; validYears: number; totalYears: number }; side: 'then' | 'now'; onClick: () => void; active: boolean }) {
   const mm = r.def.unit === 'mm'
@@ -35,7 +48,7 @@ function Tile({ r, stat, side, onClick, active }: { r: MetricResult; stat: { mea
   )
 }
 
-/** "days too hot to play outside" -> "day too hot to play outside" when n is 1. */
+/** "unusually hot days" -> "unusually hot day" when n is 1. */
 function singular(phrase: string): string {
   return phrase.replace(/\b(days|nights)\b/, (w) => w.slice(0, -1))
 }
@@ -60,12 +73,26 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
     else trendWords = t.direction === 'up' ? 'Going up steadily since 1981.' : 'Going down steadily since 1981.'
   }
   const future = projectFuture(r)
+  // The sentence compares the two lives; the stamp judges all 45 years. Say so, and say it when they disagree.
+  const gap = diff !== null && Math.abs(diff) >= 0.5
+  let mismatch = ''
+  if (t && diff !== null) {
+    if (t.significant && !gap) mismatch = 'These two lives look alike, but over all the years the line is still moving.'
+    else if (!t.significant && gap) mismatch = 'There is a gap between these two lives, but the years jump around too much to call it a steady change.'
+    else if (t.significant && gap && (diff > 0) !== (t.direction === 'up')) mismatch = 'These two lives go one way, but the long-term line goes the other.'
+  }
   return (
     <div className={`note ${worse ? 'worse' : 'better'}`}>
+      <p className="notelabel">Then vs now</p>
       <p className="line">{line}</p>
+      <p className="notelabel since">
+        All {YEARS.last - YEARS.first + 1} years, {YEARS.first}–{YEARS.last}
+      </p>
       <Verdict r={r} />
       <Sparkline r={r} />
       {trendWords && <p className="trendwords">{trendWords}</p>}
+      {mismatch && <p className="mismatch">{mismatch}</p>}
+      {t?.significant && r.def.lessCertain && <p className="mismatch">Rain is the least certain part of this data, so treat this one with care.</p>}
       {future !== null && (
         <p className="future">
           Born {FUTURE_BIRTH_YEAR}, if it keeps going: about <strong>{Math.round(future)}</strong> {mm ? 'mm' : 'a year'}.
@@ -124,6 +151,7 @@ export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; la
             <ThreeCells key={lm.metric} last={last}>
               <div className="cell then">
                 <p className="caption">{lm.title}</p>
+                {r.def.plain && <p className="plaindef">{r.def.plain}</p>}
                 <Tile r={r} stat={r.then} side="then" onClick={() => setOpen(open === lm.metric ? null : lm.metric)} active={open === lm.metric} />
               </div>
               <div className="cell mid">
@@ -131,6 +159,7 @@ export function Scrapbook({ a, lens, labels }: { a: CityAnalysis; lens: Lens; la
               </div>
               <div className="cell now">
                 <p className="caption">{lm.title}</p>
+                {r.def.plain && <p className="plaindef">{r.def.plain}</p>}
                 <Tile r={r} stat={r.now} side="now" onClick={() => setOpen(open === lm.metric ? null : lm.metric)} active={open === lm.metric} />
               </div>
             </ThreeCells>
@@ -193,6 +222,7 @@ export function TrendSentence({ r }: { r: MetricResult }) {
       <small className="muted">
         Trend test: {fmtP(t.p)}, {t.n} years. The dots are each year; the line is the long-term trend.
       </small>
+      {t.significant && r.def.lessCertain && <span className="raincaution">{RAIN_CAUTION}</span>}
     </p>
   )
 }

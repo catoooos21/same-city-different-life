@@ -149,7 +149,18 @@ export const SLOWS_DOWN: string[] = [
   'Better-insulated buildings and efficient cooling, so less heat is pumped outdoors.',
 ]
 export const FUTURE_NOTE =
-  'Cutting pollution worldwide slows the warming itself. Trees, shade and lighter surfaces cool a city’s own streets, mostly its hot nights. Rain is different: no city can steer it.'
+  'Only the main reason and the main fix move the numbers on this page. The rest change how hot the streets really feel, on top of those numbers. Rain is different again: no city can steer it.'
+
+/**
+ * What the data can and cannot see. MERRA-2 is a global model with grid squares about 50 km wide
+ * and no city in it, so the trends on this page are the region's climate. A city's own extra heat
+ * (asphalt, cars, air conditioners) is real but is NOT in these numbers. Shown wherever we list reasons.
+ */
+export const DATA_SEES =
+  'What these numbers can see: the weather here comes from a NASA model that divides the world into squares about 50 km wide. It shows how the climate of the whole region changed. It does not see one city’s streets, so the extra heat a city makes for itself is not in these numbers. It comes on top of them.'
+export const ON_TOP_HEADING = 'On top of that, inside the city (not in these numbers)'
+export const ON_TOP_HOTTER = 'On top of that, the city can make its own streets hotter still. This is not in the numbers above:'
+export const ON_TOP_COOLER = 'On top of that, the city can cool its own streets. This helps people, but it does not change the numbers above:'
 export const FUTURE_SOURCES = [
   { label: 'NASA: causes of climate change', url: 'https://science.nasa.gov/climate-change/causes/' },
   { label: 'NASA: mitigation and adaptation', url: 'https://science.nasa.gov/climate-change/adaptation-mitigation/' },

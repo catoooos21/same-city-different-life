@@ -1,4 +1,4 @@
-import { CONTEXT, GENERIC_CHOICES, GLOBAL_REASONS, type Era } from '../config/context'
+import { CONTEXT, DATA_SEES, GENERIC_CHOICES, GLOBAL_REASONS, ON_TOP_HEADING, type Era } from '../config/context'
 import type { Period } from '../metrics'
 
 function overlaps(e: Era, p: Period): boolean {
@@ -15,13 +15,20 @@ export function WhyPanel({ country, cityName, then, now }: { country: string; ci
       <h3>Why might this be?</h3>
       <p className="muted small">The NASA data shows that it changed. What follows is context from history and research, not something the data can prove.</p>
 
-      <h4>The usual reasons, everywhere</h4>
+      <p className="datasees">{DATA_SEES}</p>
+
+      <h4>The main reason, everywhere</h4>
       <ul className="simple">
-        {GLOBAL_REASONS.map((r, i) => (
-          <li key={r} className={i === 0 ? 'main' : ''}>
-            {i === 0 && <span className="maintag">Main reason</span>}
-            {r}
-          </li>
+        <li className="main">
+          <span className="maintag">Main reason</span>
+          {GLOBAL_REASONS[0]}
+        </li>
+      </ul>
+
+      <h4>{ON_TOP_HEADING}</h4>
+      <ul className="simple">
+        {GLOBAL_REASONS.slice(1).map((r) => (
+          <li key={r}>{r}</li>
         ))}
       </ul>
 
@@ -39,7 +46,8 @@ export function WhyPanel({ country, cityName, then, now }: { country: string; ci
         </>
       )}
 
-      <h4>Life choices that add heat {c ? `in ${country}` : `in a city like ${cityName}`}</h4>
+      <h4>Life choices that add heat to the streets {c ? `in ${country}` : `in a city like ${cityName}`}</h4>
+      <p className="muted small">These add to the city’s own heat and to the world’s pollution. The numbers on this page do not measure them one by one.</p>
       <ul className="simple">
         {choices.map((r) => (
           <li key={r}>{r}</li>

@@ -5,6 +5,7 @@ import { analyse, type CityAnalysis } from './metrics'
 import { DEMO_CITIES, loadDaily, type DailySeries, type LoadStatus } from './power'
 import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from './state'
 import { CaseFile } from './components/CaseFile'
+import { Compare } from './components/Compare'
 import { CountryBoard } from './components/CountryBoard'
 import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
@@ -260,10 +261,36 @@ function Result(props: {
       {analysis && daily && (
         <>
           <Scrapbook a={analysis} lens={lens} labels={labels} />
-          <FutureBook a={analysis} lens={lens} />
-          <CaseFile a={analysis} cityName={city.name} />
           <GlobalContext a={analysis} cityName={city.name} />
-          <WhyPanel country={city.country} cityName={city.name} then={then} now={now} />
+          <p className="foldbar">
+            <span>Dig deeper:</span>
+            <button
+              type="button"
+              className="linkish"
+              onClick={(e) => e.currentTarget.closest('.result')?.querySelectorAll<HTMLDetailsElement>('details.fold').forEach((d) => (d.open = true))}
+            >
+              open all
+            </button>
+            <button
+              type="button"
+              className="linkish"
+              onClick={(e) => e.currentTarget.closest('.result')?.querySelectorAll<HTMLDetailsElement>('details.fold').forEach((d) => (d.open = false))}
+            >
+              close all
+            </button>
+          </p>
+          <Fold title="Two futures" teaser="What someone born in 2040 could live through, two ways.">
+            <FutureBook a={analysis} lens={lens} />
+          </Fold>
+          <Fold title="The case file" teaser={`Everything we checked in ${city.name}, grouped by kind of evidence.`}>
+            <CaseFile a={analysis} cityName={city.name} />
+          </Fold>
+          <Fold title="Same question, another city" teaser={`Put a second city next to ${city.name}.`} open={!!q.vs}>
+            <Compare a={analysis} city={city} then={then} now={now} vs={q.vs} onVs={(vs) => set({ vs })} />
+          </Fold>
+          <Fold title="Why might this be?" teaser="The main reason, and what these numbers cannot see.">
+            <WhyPanel country={city.country} cityName={city.name} then={then} now={now} />
+          </Fold>
           <Methods a={analysis} d={daily} lens={lens} cityName={city.name} />
           <p className="share">
             <button
@@ -283,6 +310,23 @@ function Result(props: {
         </>
       )}
     </section>
+  )
+}
+
+/** A section that starts closed, so the scrapbooks stay the story and the rest is one tap away. */
+function Fold({ title, teaser, open, children }: { title: string; teaser: string; open?: boolean; children: React.ReactNode }) {
+  const [isOpen, setIsOpen] = useState(!!open)
+  useEffect(() => {
+    if (open) setIsOpen(true)
+  }, [open])
+  return (
+    <details className="fold" open={isOpen} onToggle={(e) => setIsOpen(e.currentTarget.open)}>
+      <summary>
+        <span className="foldtitle">{title}</span>
+        <span className="foldteaser">{teaser}</span>
+      </summary>
+      {children}
+    </details>
   )
 }
 

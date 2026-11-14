@@ -18,6 +18,8 @@ export interface Query {
   p1: Period
   p2: Period
   lens: string
+  /** Second city for the side-by-side comparison, or null. */
+  vs: City | null
 }
 
 export const DEFAULT_QUERY: Query = {
@@ -28,6 +30,7 @@ export const DEFAULT_QUERY: Query = {
   p1: { first: 1981, last: 1990 },
   p2: { first: 2016, last: 2025 },
   lens: 'kid',
+  vs: null,
 }
 
 export function periods(q: Query): { then: Period; now: Period } {
@@ -60,6 +63,11 @@ export function parseHash(hash: string): Query {
   q.p2 = rng(p.get('now'), q.p2)
   const lens = p.get('lens') ?? ''
   q.lens = LENSES.some((l) => l.id === lens) ? lens : DEFAULT_QUERY.lens
+  const vlat = parseFloat(p.get('vslat') ?? '')
+  const vlon = parseFloat(p.get('vslon') ?? '')
+  if (q.city && Number.isFinite(vlat) && Number.isFinite(vlon) && Math.abs(vlat) <= 90 && Math.abs(vlon) <= 180) {
+    q.vs = { name: p.get('vsname') ?? `${vlat.toFixed(2)}, ${vlon.toFixed(2)}`, country: p.get('vscountry') ?? '', lat: vlat, lon: vlon }
+  }
   return q
 }
 
@@ -80,5 +88,11 @@ export function toHash(q: Query): string {
     p.set('now', `${q.p2.first}-${q.p2.last}`)
   }
   p.set('lens', q.lens)
+  if (q.city && q.vs) {
+    p.set('vsname', q.vs.name)
+    if (q.vs.country) p.set('vscountry', q.vs.country)
+    p.set('vslat', q.vs.lat.toFixed(4))
+    p.set('vslon', q.vs.lon.toFixed(4))
+  }
   return '#' + p.toString()
 }

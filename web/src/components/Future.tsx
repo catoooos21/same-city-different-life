@@ -4,7 +4,7 @@ import { CHILDHOOD_LENGTH, YEARS } from '../config/metrics'
 import type { CityAnalysis, MetricResult } from '../metrics'
 import { FUTURE_BIRTH_YEARS, SLOWER_PACE, whatIf, type WhatIf } from '../future'
 import { fmtNum } from '../format'
-import { FUTURE_NOTE, FUTURE_SOURCES, KEEPS_GOING, SLOWS_DOWN } from '../config/context'
+import { FUTURE_NOTE, FUTURE_SOURCES, KEEPS_GOING, ON_TOP_COOLER, ON_TOP_HOTTER, SLOWS_DOWN } from '../config/context'
 
 function unitWords(r: MetricResult): string {
   return r.def.unit === 'mm' ? 'mm on the wettest day' : 'days a year'
@@ -69,8 +69,12 @@ export function FutureBook({ a, lens }: { a: CityAnalysis; lens: Lens }) {
           <p>same pace as the last {YEARS.last - YEARS.first + 1} years</p>
         </div>
         <div className="fcell fhead slower">
-          <h4>If it slows down</h4>
-          <p>half that pace from {YEARS.last + 1} on</p>
+          <h4>
+            If it slows down <span className="exampletag">example</span>
+          </h4>
+          <p>
+            say, {SLOWER_PACE === 0.5 ? 'half' : `${Math.round(SLOWER_PACE * 100)} % of`} that pace from {YEARS.last + 1} on
+          </p>
         </div>
 
         {rows.map((lm) => {
@@ -102,22 +106,30 @@ export function FutureBook({ a, lens }: { a: CityAnalysis; lens: Lens }) {
         <div className="how same">
           <h4>How it could keep going</h4>
           <ul>
-            {KEEPS_GOING.map((s, i) => (
-              <li key={s} className={i === 0 ? 'main' : ''}>
-                {i === 0 && <span className="maintag">Main reason</span>}
-                {s}
-              </li>
+            <li className="main">
+              <span className="maintag">Main reason</span>
+              {KEEPS_GOING[0]}
+            </li>
+          </ul>
+          <p className="ontop">{ON_TOP_HOTTER}</p>
+          <ul>
+            {KEEPS_GOING.slice(1).map((s) => (
+              <li key={s}>{s}</li>
             ))}
           </ul>
         </div>
         <div className="how slower">
           <h4>How it could slow down</h4>
           <ul>
-            {SLOWS_DOWN.map((s, i) => (
-              <li key={s} className={i === 0 ? 'main' : ''}>
-                {i === 0 && <span className="maintag">Main fix</span>}
-                {s}
-              </li>
+            <li className="main">
+              <span className="maintag">Main fix</span>
+              {SLOWS_DOWN[0]}
+            </li>
+          </ul>
+          <p className="ontop">{ON_TOP_COOLER}</p>
+          <ul>
+            {SLOWS_DOWN.slice(1).map((s) => (
+              <li key={s}>{s}</li>
             ))}
           </ul>
         </div>
@@ -133,7 +145,7 @@ export function FutureBook({ a, lens }: { a: CityAnalysis; lens: Lens }) {
         ))}
       </p>
       <p className="caveat">
-        These are straight lines, not climate-model projections. Nobody knows the pace of the next decades; it depends on what the world and the city do. The range under “keeps going” is the same line drawn with the uncertainty of the trend.
+        These are straight lines, not climate-model projections. “Half the pace” is only an example we picked to show a slower future; it is not a scenario from climate science. Nobody knows the pace of the next decades; it depends on what the world and the city do. The range under “keeps going” is the same line drawn with the uncertainty of the trend.
       </p>
     </section>
   )
