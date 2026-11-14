@@ -4,7 +4,7 @@ import { CHILDHOOD_LENGTH, YEARS } from '../config/metrics'
 import type { CityAnalysis, MetricResult } from '../metrics'
 import { FUTURE_BIRTH_YEARS, SLOWER_PACE, whatIf, type WhatIf } from '../future'
 import { fmtNum } from '../format'
-import { unitLong } from '../units'
+import { unitLong, valueDigits } from '../units'
 import { FUTURE_NOTE, FUTURE_SOURCES, KEEPS_GOING, ON_TOP_COOLER, ON_TOP_HOTTER, SLOWS_DOWN } from '../config/context'
 
 function unitWords(r: MetricResult): string {
@@ -12,11 +12,12 @@ function unitWords(r: MetricResult): string {
 }
 
 function FutureTile({ w, r, kind }: { w: WhatIf; r: MetricResult; kind: 'same' | 'slower' }) {
-  const lo = Math.round(w.lo)
-  const hi = Math.round(w.hi)
+  const dp = valueDigits(r.def)
+  const lo = fmtNum(w.lo, dp)
+  const hi = fmtNum(w.hi, dp)
   return (
     <div className={`tile future ${kind}`}>
-      <span className="big">{fmtNum(w.value, 0)}</span>
+      <span className="big">{fmtNum(w.value, dp)}</span>
       <span className="unit">{unitWords(r)}</span>
       {lo !== hi && (
         <span className="tiny">
@@ -87,7 +88,7 @@ export function FutureBook({ a, lens }: { a: CityAnalysis; lens: Lens }) {
               </div>
               <div className="fcell">
                 <div className="tile now">
-                  <span className="big">{fmtNum(r.now.mean, 0)}</span>
+                  <span className="big">{fmtNum(r.now.mean, valueDigits(r.def))}</span>
                   <span className="unit">{unitWords(r)}</span>
                 </div>
               </div>

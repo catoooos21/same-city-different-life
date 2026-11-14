@@ -170,6 +170,13 @@ input[type='search'] { width: 100%; font-size: 1.1rem; }
 .sparktrend.sig { stroke: var(--accent); }
 .sparktrend.nsig { stroke: var(--grey); stroke-dasharray: 4 4; }
 
+/* ---------- choose your own measures ---------- */
+.measurepicker { margin-top: 0.5rem; padding: 0.6rem 0.8rem 0.7rem; background: #f4f8fc; border: 2px dashed #c3d3e6; border-radius: 8px; }
+.measurepicker > p { margin: 0 0 0.3rem; }
+.pickgroup { display: flex; flex-wrap: wrap; align-items: center; margin-top: 0.25rem; }
+.picktitle { font-family: var(--hand); font-size: 1.2rem; color: var(--ink-now); min-width: 8.5rem; margin-right: 0.3rem; }
+.measurepicker .chip { font-size: 0.88rem; padding: 0.2rem 0.65rem; }
+
 /* ---------- folded sections ---------- */
 .foldbar { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem 0.9rem; margin: 1.6rem 0 0; font-family: var(--hand); font-size: 1.4rem; color: var(--ink-then); }
 .foldbar .linkish { font-family: var(--body); }

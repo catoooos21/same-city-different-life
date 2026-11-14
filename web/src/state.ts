@@ -1,6 +1,6 @@
 /** App state lives in the URL hash so any result can be shared as a link. */
 import { BIRTH_YEARS, YEARS } from './config/metrics'
-import { LENSES } from './config/lenses'
+import { CUSTOM_LENS_ID, DEFAULT_PICK, LENSES, cleanPick } from './config/lenses'
 import { childhood, type Period } from './metrics'
 
 export interface City {
@@ -20,6 +20,8 @@ export interface Query {
   lens: string
   /** Second city for the side-by-side comparison, or null. */
   vs: City | null
+  /** Measures chosen for the "Choose your own" lens. */
+  pick: string[]
 }
 
 export const DEFAULT_QUERY: Query = {
@@ -31,6 +33,7 @@ export const DEFAULT_QUERY: Query = {
   p2: { first: 2016, last: 2025 },
   lens: 'kid',
   vs: null,
+  pick: [...DEFAULT_PICK],
 }
 
 export function periods(q: Query): { then: Period; now: Period } {
@@ -43,7 +46,7 @@ function clampYear(v: number, lo: number, hi: number, dflt: number): number {
 
 export function parseHash(hash: string): Query {
   const p = new URLSearchParams(hash.replace(/^#/, ''))
-  const q: Query = { ...DEFAULT_QUERY, p1: { ...DEFAULT_QUERY.p1 }, p2: { ...DEFAULT_QUERY.p2 } }
+  const q: Query = { ...DEFAULT_QUERY, p1: { ...DEFAULT_QUERY.p1 }, p2: { ...DEFAULT_QUERY.p2 }, pick: [...DEFAULT_PICK] }
   const lat = parseFloat(p.get('lat') ?? '')
   const lon = parseFloat(p.get('lon') ?? '')
   if (Number.isFinite(lat) && Number.isFinite(lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
@@ -63,6 +66,7 @@ export function parseHash(hash: string): Query {
   q.p2 = rng(p.get('now'), q.p2)
   const lens = p.get('lens') ?? ''
   q.lens = LENSES.some((l) => l.id === lens) ? lens : DEFAULT_QUERY.lens
+  q.pick = cleanPick((p.get('pick') ?? '').split(','))
   const vlat = parseFloat(p.get('vslat') ?? '')
   const vlon = parseFloat(p.get('vslon') ?? '')
   if (q.city && Number.isFinite(vlat) && Number.isFinite(vlon) && Math.abs(vlat) <= 90 && Math.abs(vlon) <= 180) {
@@ -88,6 +92,7 @@ export function toHash(q: Query): string {
     p.set('now', `${q.p2.first}-${q.p2.last}`)
   }
   p.set('lens', q.lens)
+  if (q.lens === CUSTOM_LENS_ID) p.set('pick', cleanPick(q.pick).join(','))
   if (q.city && q.vs) {
     p.set('vsname', q.vs.name)
     if (q.vs.country) p.set('vscountry', q.vs.country)

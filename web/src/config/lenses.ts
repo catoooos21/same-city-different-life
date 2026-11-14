@@ -112,4 +112,65 @@ export const LENSES: Lens[] = [
   },
 ]
 
+// ---------- "Choose your own": the visitor picks the measures ----------
+
+export const CUSTOM_LENS_ID = 'custom'
+/** What the custom lens shows until the visitor changes it: the two basics and the two best-known counts. */
+export const DEFAULT_PICK = ['mean_temp', 'rain_total', 'hot_days', 'rainy_days']
+
+/** Neutral wording for every measure, used when the visitor builds their own list. Also the order they are shown in. */
+export const CUSTOM_WORDS: Record<string, Omit<LensMetric, 'metric'>> = {
+  mean_temp: { title: 'Average temperature', phrase: '°C on average', moreIsBad: true },
+  mean_tmax: { title: 'Average daytime high', phrase: '°C in the daytime highs', moreIsBad: true },
+  mean_tmin: { title: 'Average night-time low', phrase: '°C in the night-time lows', moreIsBad: true },
+  rain_total: { title: 'Rain in the year', phrase: 'mm rain over the year', moreIsBad: false },
+  hot_days: { title: 'Unusually hot days', phrase: 'unusually hot days', moreIsBad: true },
+  very_hot_days: { title: 'Very hot days (35 °C+)', phrase: 'very hot days', moreIsBad: true },
+  hot_nights: { title: 'Unusually warm nights', phrase: 'unusually warm nights', moreIsBad: true },
+  tropical_nights: { title: 'Tropical nights (20 °C+)', phrase: 'tropical nights', moreIsBad: true },
+  heatwave_days: { title: 'Heatwave days', phrase: 'heatwave days', moreIsBad: true },
+  frost_days: { title: 'Frost days', phrase: 'frost days', moreIsBad: true },
+  rainy_days: { title: 'Rainy days', phrase: 'rainy days', moreIsBad: false },
+  heavy_rain_days: { title: 'Heavy rain days (10 mm+)', phrase: 'heavy rain days', moreIsBad: true },
+  biggest_downpour: { title: 'Biggest downpour', phrase: 'mm in the biggest downpour', moreIsBad: true },
+  longest_dry_spell: { title: 'Longest dry spell', phrase: 'days in the longest dry spell', moreIsBad: true },
+  sticky_days: { title: 'Sticky, muggy days', phrase: 'sticky days', moreIsBad: true },
+  perfect_days: { title: 'Perfect outdoor days', phrase: 'perfect outdoor days', moreIsBad: false },
+  training_days: { title: 'Good training days', phrase: 'good training days', moreIsBad: false },
+}
+
+const CUSTOM_ORDER = Object.keys(CUSTOM_WORDS)
+
+/** Known ids only, no repeats, in a fixed order (basics first); the default list when nothing valid is left. */
+export function cleanPick(pick: string[]): string[] {
+  const wanted = new Set(pick)
+  const out = CUSTOM_ORDER.filter((id) => wanted.has(id))
+  return out.length ? out : [...DEFAULT_PICK]
+}
+
+function customMetrics(pick: string[]): LensMetric[] {
+  return cleanPick(pick).map((id) => ({ metric: id, ...CUSTOM_WORDS[id] }))
+}
+
+const CUSTOM_LENS: Lens = {
+  id: CUSTOM_LENS_ID,
+  label: 'Choose your own',
+  emoji: '🔎',
+  subject: 'Someone living here from',
+  intro: 'You chose the measures. Same city, different years.',
+  metrics: customMetrics(DEFAULT_PICK),
+  calendar: true,
+}
+LENSES.push(CUSTOM_LENS)
+
+/** The custom lens with the visitor's own list of measures. */
+export function customLens(pick: string[]): Lens {
+  return { ...CUSTOM_LENS, metrics: customMetrics(pick) }
+}
+
 export const LENS_BY_ID: Record<string, Lens> = Object.fromEntries(LENSES.map((l) => [l.id, l]))
+
+/** The lens for a query: a ready-made one, or the visitor's own list. */
+export function lensFor(lensId: string, pick: string[]): Lens {
+  return lensId === CUSTOM_LENS_ID ? customLens(pick) : LENS_BY_ID[lensId]
+}

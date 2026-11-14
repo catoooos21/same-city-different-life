@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { BIRTH_YEARS, YEARS } from './config/metrics'
-import { LENSES, LENS_BY_ID, type Lens } from './config/lenses'
+import { CUSTOM_LENS_ID, LENSES, lensFor, type Lens } from './config/lenses'
+import { MeasurePicker } from './components/MeasurePicker'
 import { analyse, type CityAnalysis } from './metrics'
 import { DEMO_CITIES, loadDaily, type DailySeries, type LoadStatus } from './power'
 import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from './state'
@@ -59,7 +60,7 @@ export default function App() {
   const { then, now } = periods(q)
   const analysis = useMemo<CityAnalysis | null>(() => (daily ? analyse(daily, then, now) : null), [daily, then.first, then.last, now.first, now.last])
 
-  const lens = LENS_BY_ID[q.lens]
+  const lens = lensFor(q.lens, q.pick)
   const set = (patch: Partial<Query>) => setQ((old) => ({ ...old, ...patch }))
 
   return (
@@ -127,6 +128,7 @@ function Home({ q, set }: { q: Query; set: (p: Partial<Query>) => void }) {
         <div className="field">
           <span>Who are you?</span>
           <LensPicker value={q.lens} onChange={(lens) => set({ lens })} />
+          {q.lens === CUSTOM_LENS_ID && <MeasurePicker value={q.pick} onChange={(pick) => set({ pick })} />}
         </div>
         <button type="submit" className="btn primary" disabled={!pending}>
           Open the scrapbooks
@@ -169,7 +171,7 @@ function Result(props: {
   now: { first: number; last: number }
 }) {
   const { q, set, daily, analysis, status, error, then, now } = props
-  const lens = LENS_BY_ID[q.lens]
+  const lens = lensFor(q.lens, q.pick)
   const city = q.city!
   const cityName = city.country ? `${city.name}, ${city.country}` : city.name
   const isKid = lens.id === 'kid'
@@ -232,6 +234,7 @@ function Result(props: {
         <div className="field wide">
           <span>Who are you?</span>
           <LensPicker value={q.lens} onChange={(lensId) => set({ lens: lensId })} />
+          {q.lens === CUSTOM_LENS_ID && <MeasurePicker value={q.pick} onChange={(pick) => set({ pick })} />}
         </div>
       </div>
 

@@ -107,6 +107,7 @@ Defined in [web/src/config/lenses.ts](web/src/config/lenses.ts). Adding a lens i
 | Runner / athlete | good training days, hot days, sticky days, calendar |
 | Older person | hot nights, tropical nights, heatwave days, very hot days |
 | Traveller / event planner | perfect outdoor days, rainy days, very hot days, outdoor calendar |
+| Choose your own | any of the 17 measures, ticked by the visitor (including the four basics); the list is kept in the link as `pick=` |
 
 Modes: **Two childhoods** (birth year b → years b to b+9; birth years 1981–2016) and **Any two periods**
 (default 1981–1990 vs 2016–2025).
@@ -130,7 +131,7 @@ and the real Kuwait hot-days series). The Python reference lives in [pipeline/st
 regenerate the fixtures with `python -m pipeline.tests.make_js_fixtures`.
 
 ```bash
-cd web && npm test            # 80 tests: statistics vs Python, calendar, metrics engine, missing-day rule, the basics, case file, two cities, two futures, satellite rain
+cd web && npm test            # 90 tests: statistics vs Python, calendar, metrics engine, missing-day rule, the basics, case file, two cities, two futures, satellite rain, choose your own
 python -m pytest pipeline/tests   # Python reference tests
 ```
 

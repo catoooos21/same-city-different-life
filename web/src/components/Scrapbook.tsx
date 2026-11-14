@@ -8,6 +8,7 @@ import { CalendarChart, Sparkline, YearChart } from './YearChart'
 import { FUTURE_BIRTH_YEAR } from '../config/context'
 import { CHILDHOOD_LENGTH, YEARS } from '../config/metrics'
 import { clampValue, rateDigits, unitLong, unitShort, valueDigits } from '../units'
+import { futureWords, hasGap, noteLine } from '../notewords'
 
 export interface PageLabels {
   then: { born: string; years: string }
@@ -48,24 +49,12 @@ function Tile({ r, stat, side, onClick, active }: { r: MetricResult; stat: { mea
   )
 }
 
-/** "unusually hot days" -> "unusually hot day" when n is 1. */
-function singular(phrase: string): string {
-  return phrase.replace(/\b(days|nights)\b/, (w) => w.slice(0, -1))
-}
-
 function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
   const diff = r.diff
-  const mm = r.def.unit === 'mm'
-  let line: string
-  if (diff === null) line = 'Not enough complete years to compare.'
-  else if (Math.abs(diff) < 0.5) line = `About the same ${mm ? 'biggest downpour' : lm.phrase}.`
-  else {
-    const n = Math.round(Math.abs(diff))
-    const phrase = n === 1 ? singular(lm.phrase) : lm.phrase
-    line = mm ? `${n} mm ${diff > 0 ? 'more' : 'less'} in the biggest downpour.` : `${n} ${diff > 0 ? 'more' : 'fewer'} ${phrase}, every year.`
-  }
+  const line = noteLine(r.def, lm, diff)
+  const gap = hasGap(r.def, diff)
   const t = r.trend
-  const worse = diff !== null && Math.abs(diff) >= 0.5 && (diff > 0) === lm.moreIsBad
+  const worse = gap && (diff as number) > 0 === lm.moreIsBad
   // One plain line about the long-term trend; the numbers live behind "tap any number".
   let trendWords = ''
   if (t) {
@@ -74,7 +63,6 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
   }
   const future = projectFuture(r)
   // The sentence compares the two lives; the stamp judges all 45 years. Say so, and say it when they disagree.
-  const gap = diff !== null && Math.abs(diff) >= 0.5
   let mismatch = ''
   if (t && diff !== null) {
     if (t.significant && !gap) mismatch = 'These two lives look alike, but over all the years the line is still moving.'
@@ -95,7 +83,7 @@ function Note({ r, lm }: { r: MetricResult; lm: LensMetric }) {
       {t?.significant && r.def.lessCertain && <p className="mismatch">Rain is the least certain part of this data, so treat this one with care.</p>}
       {future !== null && (
         <p className="future">
-          Born {FUTURE_BIRTH_YEAR}, if it keeps going: about <strong>{Math.round(future)}</strong> {mm ? 'mm' : 'a year'}.
+          Born {FUTURE_BIRTH_YEAR}, if it keeps going: about <strong>{futureWords(r.def, future)}</strong>.
         </p>
       )}
     </div>
