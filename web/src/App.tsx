@@ -6,7 +6,7 @@ import { DEMO_CITIES, loadDaily, type DailySeries, type LoadStatus } from './pow
 import { DEFAULT_QUERY, parseHash, periods, toHash, type City, type Query } from './state'
 import { CaseFile } from './components/CaseFile'
 import { Compare } from './components/Compare'
-import { CountryBoard } from './components/CountryBoard'
+import { CountryStanding } from './components/CountryStanding'
 import { FutureBook } from './components/Future'
 import { CitySearch } from './components/CitySearch'
 import { Scrapbook, periodLabel, type PageLabels } from './components/Scrapbook'
@@ -140,7 +140,6 @@ function Home({ q, set }: { q: Query; set: (p: Partial<Query>) => void }) {
         ))}
       </p>
       <p className="muted small">Any city on Earth works. The weather comes straight from NASA.</p>
-      <CountryBoard onPick={go} />
     </section>
   )
 }
@@ -260,6 +259,7 @@ function Result(props: {
       )}
       {analysis && daily && (
         <>
+          <CountryStanding a={analysis} city={city} />
           <Scrapbook a={analysis} lens={lens} labels={labels} />
           <GlobalContext a={analysis} cityName={city.name} />
           <p className="foldbar">

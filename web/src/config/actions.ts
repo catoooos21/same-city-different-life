@@ -34,7 +34,7 @@ export interface CountryAction {
   target: string
   /** The reasons: rules and steps, in plain words. */
   steps: string[]
-  /** A caution shown under the weather stamp when the data needs explaining. */
+  /** A caution shown with the weather stamp when a city in this country is flat or cooling. */
   dataNote?: string
   sources: { label: string; url: string }[]
 }
@@ -138,7 +138,7 @@ export const ACTIONS: Record<string, CountryAction> = {
     target: 'Net zero by 2070, pledged at the COP26 summit in Glasgow in November 2021.',
     steps: [],
     dataNote:
-      'New Delhi cools in this dataset. That is not climate policy at work. Researchers link the weak daytime warming of the north Indian plain mainly to thick air-pollution haze that blocks sunlight, with heavy irrigation also suggested, and warn it could flip to faster warming as the air gets cleaner.',
+      'A flat or cooling trend here is not climate policy at work. Researchers link the weak daytime warming of the north Indian plain mainly to thick air-pollution haze that blocks sunlight, with heavy irrigation also suggested, and warn it could flip to faster warming as the air gets cleaner.',
     sources: [
       { label: 'Deccan Herald: aerosols and irrigation behind India’s slower warming (2026)', url: 'https://www.deccanherald.com/india/aerosol-irrigation-behind-indias-slower-warming-than-world-average-report-3974915' },
       { label: 'The Quint: India’s 2070 net-zero target', url: 'https://www.thequint.com/climate-change/net-zero-india-target-2070-where-does-rest-of-world-stand' },
