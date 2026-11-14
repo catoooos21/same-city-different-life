@@ -82,6 +82,48 @@ export const CONTEXT: Record<string, CountryContext> = {
       { label: 'US Department of Defense: chronology of the 1991 Kuwait oil well fires', url: 'https://gulflink.osd.mil/owf_ii/owf_ii_s03.htm' },
     ],
   },
+  Egypt: {
+    eras: [
+      {
+        from: 1981,
+        to: 1990,
+        title: 'Cairo spills onto the fields',
+        text: 'About 45 million Egyptians. Cairo grew fast, and new neighbourhoods were built on Delta farmland without permits. Most trips were by bus, shared taxi or on foot. The first metro line opened in 1987.',
+      },
+      {
+        from: 1991,
+        to: 2004,
+        title: 'Into the desert',
+        text: 'The economy opened up. New desert cities rose around Cairo: 6th of October, Sheikh Zayed and, from 2000, New Cairo. The Ring Road wrapped the city and the private car became the goal. The population passed 60 million in the mid-1990s.',
+      },
+      {
+        from: 2005,
+        to: 2013,
+        title: 'Compounds, cars and blackouts',
+        text: 'Gated compounds spread into the desert and cars filled the roads. After the 2011 revolution, building on farmland sped up to roughly 30,000 feddans a year. The summers of 2012 to 2014 brought rolling power cuts in the heat.',
+      },
+      {
+        from: 2014,
+        to: 2025,
+        title: 'A hundred million people',
+        text: 'The population passed 100 million in February 2020. A new capital has been under construction in the desert since 2015, and new highways and bridges cut through Cairo, with trees removed to widen roads. About 10 million licensed vehicles, 2.6 million of them in Cairo. The power grid breaks its summer record almost every year, and in 2023 and 2024 that meant rolling power cuts again.',
+      },
+    ],
+    choices: [
+      'A private car or a ride-hailing app instead of the bus or a walk: about 10 million licensed vehicles, 2.6 million in Cairo alone.',
+      'Air conditioning becoming normal at home and in every shop, which is why summer electricity sets a new record almost every year.',
+      'Houses and flats built on Delta farmland: roughly 30,000 feddans of fields lost a year after 2011.',
+      'New desert cities and compounds far from the Nile, reached by car.',
+      'Trees cut and gardens paved for wider roads and bridges.',
+    ],
+    sources: [
+      { label: 'UN World Population Prospects 2024', url: 'https://population.un.org/wpp/' },
+      { label: 'Ahram Online: population reaches 100 million (CAPMAS, February 2020)', url: 'https://english.ahram.org.eg/NewsContent/1/64/362720/Egypt/Politics-/Egypts-population-to-hit--million-at-home-next-wee.aspx' },
+      { label: 'Arab Finance: licensed vehicles in Egypt, 2023 (CAPMAS)', url: 'https://www.arabfinance.com/News/newdetails/13932' },
+      { label: 'Ahram Online: power grid hits a record 40,000 MW in a heatwave', url: 'https://english.ahram.org.eg/News/574471.aspx' },
+      { label: 'Scientific American: Nile Delta under threat from illegal building', url: 'https://www.scientificamerican.com/article/nile-river-delta-under-threat-from-illegal-building/' },
+    ],
+  },
 }
 
 /** Pace line shown under the "vs the world" comparison. Source: NASA climate evidence page. */
